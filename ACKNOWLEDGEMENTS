@@ -1,0 +1,18 @@
+Acknowledgements: preg
+
+Copyright (C) 2012, Log2Timeline maintainers <log2timeline-maintainers@googlegroups.com>
+Please see the AUTHORS file for details on individual authors.
+
+Preg is an interactive Windows Registry analysis tool that originates from
+the plaso project.
+
+Preg is currently developed and maintained by:
+* Daniel White
+* Joachim Metz
+
+Preg depends on various other projects. So thanks to the authors and others
+involved with these projects.
+
+Thanks to contributors (alphabetically based on last name):
+* DC3
+
