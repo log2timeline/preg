@@ -13,11 +13,10 @@ from plaso.lib import errors
 
 from scripts import preg
 
-from tests import test_lib as shared_test_lib
-from tests.cli import test_lib as cli_test_lib
+from tests import test_lib
 
 
-class PregFrontendTest(shared_test_lib.BaseTestCase):
+class PregFrontendTest(test_lib.BaseTestCase):
   """Tests for the preg front-end."""
 
   def _ConfigureSingleFileTest(self, knowledge_base_values=None):
@@ -47,7 +46,7 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
     front_end.SetKnowledgeBase(knowledge_base_object)
     return front_end
 
-  @shared_test_lib.skipUnlessHasTestFile([u'registry_test.dd'])
+  @test_lib.skipUnlessHasTestFile([u'registry_test.dd'])
   def _ConfigureStorageMediaFileTest(self):
     """Configure a test against a storage media file.
 
@@ -76,7 +75,7 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
     front_end.SetSourcePathSpecs([scan_node.path_spec])
     return front_end
 
-  @shared_test_lib.skipUnlessHasTestFile([u'SYSTEM'])
+  @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testExpandKeysRedirect(self):
     """Tests the ExpandKeysRedirect function."""
     front_end = self._ConfigureSingleFileTest()
@@ -94,7 +93,7 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
     for added_key_path in added_key_paths:
       self.assertIn(added_key_path, registry_key_paths)
 
-  @shared_test_lib.skipUnlessHasTestFile([u'SYSTEM'])
+  @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testGetRegistryFilePaths(self):
     """Tests the GetRegistryFilePaths function."""
     front_end = self._ConfigureSingleFileTest()
@@ -109,8 +108,8 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
     paths = front_end.GetRegistryFilePaths(registry_file_types)
     self.assertEqual(sorted(paths), sorted(expected_paths))
 
-  @shared_test_lib.skipUnlessHasTestFile([u'SYSTEM'])
-  @shared_test_lib.skipUnlessHasTestFile([u'registry_test.dd'])
+  @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
+  @test_lib.skipUnlessHasTestFile([u'registry_test.dd'])
   def testGetRegistryHelpers(self):
     """Tests the GetRegistryHelpers function."""
     front_end = self._ConfigureSingleFileTest()
@@ -152,7 +151,7 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
     # TODO: Add a test for getting Registry helpers from a storage media file
     # that contains VSS stores.
 
-  @shared_test_lib.skipUnlessHasTestFile([u'SYSTEM'])
+  @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testGetRegistryPlugins(self):
     """Tests the GetRegistryPlugin function."""
     front_end = self._ConfigureSingleFileTest()
@@ -169,7 +168,7 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
 
     self.assertIn(u'userassist', other_plugin_names)
 
-  @shared_test_lib.skipUnlessHasTestFile([u'SYSTEM'])
+  @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testParseRegistry(self):
     """Tests the ParseRegistryFile and ParseRegistryKey functions."""
     front_end = self._ConfigureSingleFileTest()
@@ -236,7 +235,7 @@ class PregFrontendTest(shared_test_lib.BaseTestCase):
       self.assertEqual(event_values, parsed_key_event_values)
 
 
-class PregToolTest(cli_test_lib.CLIToolTestCase):
+class PregToolTest(test_lib.CLIToolTestCase):
   """Tests for the preg tool."""
 
   def _ExtractPluginsAndKey(self, string):
@@ -272,18 +271,18 @@ class PregToolTest(cli_test_lib.CLIToolTestCase):
 
   def setUp(self):
     """Sets up the needed objects used throughout the test."""
-    self._output_writer = cli_test_lib.TestOutputWriter(encoding=u'utf-8')
+    self._output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
     self._test_tool = preg.PregTool(output_writer=self._output_writer)
 
   def testParseOptions(self):
     """Tests the ParseOptions function."""
-    options = cli_test_lib.TestOptions()
+    options = test_lib.TestOptions()
     options.foo = u'bar'
 
     with self.assertRaises(errors.BadConfigOption):
       self._test_tool.ParseOptions(options)
 
-    options = cli_test_lib.TestOptions()
+    options = test_lib.TestOptions()
     options.registry_file = u'this_path_does_not_exist'
 
     with self.assertRaises(errors.BadConfigOption):
@@ -291,7 +290,7 @@ class PregToolTest(cli_test_lib.CLIToolTestCase):
 
   def testListPluginInformation(self):
     """Tests the ListPluginInformation function."""
-    options = cli_test_lib.TestOptions()
+    options = test_lib.TestOptions()
     options.show_info = True
 
     self._test_tool.ParseOptions(options)
@@ -360,7 +359,7 @@ class PregToolTest(cli_test_lib.CLIToolTestCase):
 
   def testRunModeRegistryPlugin(self):
     """Tests the RunModeRegistryPlugin function."""
-    options = cli_test_lib.TestOptions()
+    options = test_lib.TestOptions()
     options.registry_file = self._GetTestFilePath([u'NTUSER.DAT'])
     options.plugin_names = u'userassist'
     options.verbose = False
@@ -381,7 +380,7 @@ class PregToolTest(cli_test_lib.CLIToolTestCase):
 
   def testRunModeRegistryKey(self):
     """Tests the RunModeRegistryKey function."""
-    options = cli_test_lib.TestOptions()
+    options = test_lib.TestOptions()
     options.key = (
         u'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion')
     options.parser_names = u''
@@ -399,7 +398,7 @@ class PregToolTest(cli_test_lib.CLIToolTestCase):
 
   def testRunModeRegistryFile(self):
     """Tests the RunModeRegistryFile function."""
-    options = cli_test_lib.TestOptions()
+    options = test_lib.TestOptions()
     options.registry_file = self._GetTestFilePath([u'SOFTWARE'])
 
     self._test_tool.ParseOptions(options)
@@ -441,7 +440,7 @@ class PregToolTest(cli_test_lib.CLIToolTestCase):
     self.assertGreater(line_count, 1400)
 
 
-class PregConsoleTest(cli_test_lib.CLIToolTestCase):
+class PregConsoleTest(test_lib.CLIToolTestCase):
   """Tests for the preg console."""
 
   # pylint: disable=protected-access
@@ -481,7 +480,7 @@ class PregConsoleTest(cli_test_lib.CLIToolTestCase):
 
   def setUp(self):
     """Sets up the needed objects used throughout the test."""
-    self._output_writer = cli_test_lib.TestOutputWriter(encoding=u'utf-8')
+    self._output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
     self._test_tool = preg.PregTool(output_writer=self._output_writer)
     self._test_console = preg.PregConsole(self._test_tool)
     file_entry = self._GetTestFileEntry([u'NTUSER.DAT'])
@@ -503,7 +502,7 @@ class PregConsoleTest(cli_test_lib.CLIToolTestCase):
 
   def testPrintBanner(self):
     """Test the PrintBanner function."""
-    output_writer = cli_test_lib.TestOutputWriter(encoding=u'utf-8')
+    output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
     setattr(self._test_console, u'_output_writer', output_writer)
     setattr(self._test_console.preg_tool, u'_output_writer', output_writer)
 
@@ -528,7 +527,7 @@ class PregConsoleTest(cli_test_lib.CLIToolTestCase):
 
   def testPrintRegistryFileList(self):
     """Test the PrintRegistryFileList function."""
-    output_writer = cli_test_lib.TestOutputWriter(encoding=u'utf-8')
+    output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
     setattr(self._test_console, u'_output_writer', output_writer)
     setattr(self._test_console.preg_tool, u'_output_writer', output_writer)
 
@@ -575,14 +574,14 @@ class PregConsoleTest(cli_test_lib.CLIToolTestCase):
         u'http://javadl.sun.com/webapps/download/AutoDL?BundleId=33742')
 
 
-class PregMagicClassTest(cli_test_lib.CLIToolTestCase):
+class PregMagicClassTest(test_lib.CLIToolTestCase):
   """Tests for the IPython magic class."""
 
   # pylint: disable=protected-access
 
   def setUp(self):
     """Sets up the needed objects used throughout the test."""
-    self._output_writer = cli_test_lib.TestOutputWriter(encoding=u'utf-8')
+    self._output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
     test_tool = preg.PregTool(output_writer=self._output_writer)
     front_end = getattr(test_tool, '_front_end', None)
     front_end.SetKnowledgeBase(test_tool._knowledge_base_object)
