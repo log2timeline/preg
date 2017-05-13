@@ -29,12 +29,11 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
   """Class that implements the preg front-end.
 
   Attributes:
-    knowledge_base_object: the knowledge base object (instance
-                           of KnowledgeBase).
+    knowledge_base_object (plaso.KnowledgeBase): knowledge base.
   """
 
   def __init__(self):
-    """Initializes the front-end object."""
+    """Initializes a front-end object."""
     super(PregFrontend, self).__init__()
     self._mount_path_spec = None
     self._parse_restore_points = False
@@ -49,12 +48,12 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
 
   @property
   def registry_plugin_list(self):
-    """The Windows Registry plugin list (instance of PluginList)."""
+    """PluginList: Windows Registry plugin list."""
     return self._registry_plugin_list
 
   def _CreateWindowsPathResolver(
       self, file_system, mount_point, environment_variables):
-    """Create a Windows path resolver and sets the evironment variables.
+    """Creates a Windows path resolver and sets the evironment variables.
 
     Args:
       file_system (dfvfs.FileSytem): file system.
@@ -82,19 +81,18 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     return path_resolver
 
   def _GetRegistryHelperFromPath(self, path, codepage):
-    """Return a Registry helper object from a path.
+    """Retrieves a Windows Registry helper from a path.
 
-    Given a path to a Registry file this function goes through
-    all the discovered source path specifications (instance of PathSpec)
-    and extracts Registry helper objects based on the supplied
-    path.
+    Given a path to a Windows Registry file this function goes through
+    all the discovered source path specifications (instances of dfvfs.PathSpec)
+    and extracts Windows Registry helpers based on the supplied path.
 
     Args:
-      path: the path filter to a Registry file.
-      codepage: the codepage used for the Registry file.
+      path (str): path of the Windows Registry file.
+      codepage (str): codepage of the Windows Registry file.
 
     Yields:
-      A Registry helper object (instance of PregRegistryHelper).
+      PregRegistryHelper: Windows Registry helper.
     """
     environment_variables = self.knowledge_base_object.GetEnvironmentVariables()
 
@@ -176,20 +174,21 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
 
     The mount point path specification refers to either a directory or
     a volume on storage media device or image. It is needed by the dfVFS
-    file system searcher (instance of FileSystemSearcher) to indicate
+    file system searcher (instance of dfvfs.FileSystemSearcher) to indicate
     the base location of the file system.
 
     Args:
-      source_path_spec: The source path specification (instance of
-                        dfvfs.PathSpec) of the file system.
-      resolver_context: Optional resolver context (instance of dfvfs.Context).
-                        The default is None which will use the built in context
-                        which is not multi process safe. Note that every thread
-                        or process must have its own resolver context.
+      source_path_spec (dfvfs.PathSpec): source path specification of
+          the file system.
+      resolver_context (Optional[dfvfs.Context]): resolver context, where None
+          will use the built in context which is not multi process safe. Note
+          that every thread or process must have its own resolver context.
 
     Returns:
-      A tuple of the file system (instance of dfvfs.FileSystem) and
-      the mount point path specification (instance of path.PathSpec).
+      tuple: contains:
+
+      * dfvfs.FileSystem: file system.
+      * dfvfs.PathSpec: mount point path specification.
 
     Raises:
       RuntimeError: if source path specification is not set.
@@ -209,10 +208,10 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     return file_system, mount_point
 
   def ExpandKeysRedirect(self, keys):
-    """Expands a list of Registry key paths with their redirect equivalents.
+    """Expands Windows Registry key paths with their redirect equivalents.
 
     Args:
-      keys: a list of Windows Registry key paths.
+      keys (list[str]): Windows Registry key paths.
     """
     for key in keys:
       if key.startswith(u'\\Software') and u'Wow6432Node' not in key:
@@ -220,16 +219,17 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
         keys.append(u'{0:s}\\Wow6432Node{1:s}'.format(first, second))
 
   def GetRegistryFilePaths(self, registry_file_types):
-    """Returns a list of Windows Registry file paths.
+    """Retrieves Windows Registry file paths.
 
     If the Windows Registry file type is not set this functions attempts
-    to determine it based on the presence of specific Registry keys.
+    to determine it based on the presence of specific Windows Registry keys.
 
     Args:
-      registry_file_types: a set of Windows Registry file type strings.
+      registry_file_types (set[str]): Windows Registry file types, such as
+          "NTUSER", "SOFTWARE".
 
     Returns:
-      A list of path of Windows Registry files.
+      list[str]: paths of Windows Registry files.
     """
     if self._parse_restore_points:
       restore_path = (
@@ -278,15 +278,14 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
   # TODO: refactor this function. Current implementation is too complex.
   def GetRegistryHelpers(
       self, registry_file_types=None, plugin_names=None, codepage=u'cp1252'):
-    """Returns a list of discovered Registry helpers.
+    """Retrieves discovered Windows Registry helpers.
 
     Args:
-      registry_file_types: optional list of Windows Registry file types,
-                           e.g.: NTUSER, SAM, etc that should be included.
-      plugin_names: optional list of strings containing the name of the
-                    plugin(s) or an empty string for all the types. The default
-                    is None.
-      codepage: the codepage used for the Registry file.
+      registry_file_types (Optional[list[str]]): of Windows Registry file types,
+          for example "NTUSER" or "SAM" that should be included.
+      plugin_names (Optional[str]): names of the plugins or an empty string for
+          all the plugins.
+      codepage (str): codepage of the Windows Registry file.
 
     Returns:
       list[PregRegistryHelper]: Windows Registry helpers.
@@ -351,11 +350,11 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     """Retrieves the Windows Registry plugins based on a filter string.
 
     Args:
-      filter_string: string containing the name of the plugin or an empty
-                     string for all the plugins.
+      filter_string (str): name of the plugin or an empty string for all
+          the plugins.
 
     Returns:
-      A list of Windows Registry plugins (instance of RegistryPlugin).
+      list[plaso.RegistryPlugin]: Windows Registry plugins.
     """
     return self._registry_plugin_list.GetRegistryPlugins(filter_string)
 
@@ -364,10 +363,11 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     """Retrieves the Windows Registry plugins based on a Registry type.
 
     Args:
-      registry_file_type: the Windows Registry files type string.
+      registry_file_type (str): Windows Registry file type, such as "NTUSER",
+          "SOFTWARE".
 
     Returns:
-      A list of Windows Registry plugins (instance of RegistryPlugin).
+      list[plaso.RegistryPlugin]: Windows Registry plugins.
     """
     return self._registry_plugin_list.GetRegistryPluginsFromRegistryType(
         registry_file_type)
@@ -376,19 +376,19 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     """Retrieves the Windows Registry types based on a filter string.
 
     Args:
-      filter_string: string containing the name of the plugin or an empty
-                     string for all the plugins.
+      filter_string (str): name of the plugin or an empty string for all
+          the plugins.
 
     Returns:
-      A list of Windows Registry types.
+      list[str]: Windows Registry types.
     """
     return self._registry_plugin_list.GetRegistryTypes(filter_string)
 
   def GetWindowsRegistryPlugins(self):
-    """Build a list of all available Windows Registry plugins.
+    """Retrieves a list of all available Windows Registry plugins.
 
     Returns:
-      A plugins list (instance of PluginList).
+      PluginList: Windows Registry plugins list.
     """
     winreg_parser = parsers_manager.ParsersManager.GetParserObjectByName(
         u'winreg')
@@ -402,22 +402,23 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
 
   def ParseRegistryFile(
       self, registry_helper, key_paths=None, use_plugins=None):
-    """Extracts events from a Registry file.
+    """Extracts information from a Windows Registry file.
 
-    This function takes a Registry helper object (instance of
-    PregRegistryHelper) and information about either Registry plugins or keys.
-    The function then opens up the Registry file and runs the plugins defined
-    (or all if no plugins are defined) against all the keys supplied to it.
+    This function takes a Windows Registry helper (instance of
+    PregRegistryHelper) and information about either Windows Registry plugins
+    or keys. The function then open the Windows Registry file and runs
+    the plugins defined (or all if no plugins are defined) against all the keys
+    supplied to it.
 
     Args:
-      registry_helper: Registry helper object (instance of PregRegistryHelper)
-      key_paths: optional list of Registry keys paths that are to be parsed.
-                 The default is None, which results in no keys parsed.
-      use_plugins: optional list of plugins used to parse the key. The
-                   default is None, in which case all plugins are used.
+      registry_helper (PregRegistryHelper): Windows Registry helper.
+      key_paths (Optional[list[str]]): Windows Registry keys paths that are
+          to be parsed, where None indicates no keys to parse.
+      use_plugins (Optional[list[str]]): names of the plugins used to parse
+          the Windows Regisry key, where None indicates all plugins to be used.
 
     Returns:
-      A dict that contains the following structure:
+      dict[str, object]: extracted events per key path. For example: {
           key_path:
               key: a Registry key (instance of dfwinreg.WinRegistryKey)
               subkeys: a list of Registry keys (instance of
@@ -427,8 +428,7 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
                   event_objects: List of event objects extracted.
 
           key_path 2:
-              ...
-      Or an empty dict on error.
+              ... }
     """
     if not registry_helper:
       return {}
@@ -459,22 +459,30 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     return return_dict
 
   def ParseRegistryKey(self, registry_key, registry_helper, use_plugins=None):
-    """Parse a single Registry key and return parsed information.
+    """Extracts information from a Windows Registry key.
 
-    Parses the Registry key either using the supplied plugin or trying against
-    all available plugins.
+    Parses the Windows Registry key either using the supplied plugin or
+    trying against all available plugins.
 
     Args:
-      registry_key: the Registry key to parse (instance of
-                    dfwinreg.WinRegistryKey or a string containing key path).
-      registry_helper: the Registry helper object (instance of
-                       PregRegistryHelper).
-      use_plugins: optional list of plugin names to use. The default is None
-                   which uses all available plugins.
+      registry_key (dfwinreg.WinRegistryKey|str): Windows Registry key or
+          key path to parse.
+      registry_helper (PregRegistryHelper): Windows Registry helper.
+      use_plugins (Optional[list[str]]): names of plugin to use, where None
+          indicates to use all available plugins.
 
     Returns:
-      A dictionary with plugin objects as keys and extracted event objects from
-      each plugin as values or an empty dict on error.
+      dict[str, object]: extracted events per key path. For example: {
+          key_path:
+              key: a Registry key (instance of dfwinreg.WinRegistryKey)
+              subkeys: a list of Registry keys (instance of
+                       dfwinreg.WinRegistryKey).
+              data:
+                plugin: a plugin object (instance of RegistryPlugin)
+                  event_objects: List of event objects extracted.
+
+          key_path 2:
+              ... }
     """
     if not registry_helper:
       return {}
@@ -535,9 +543,8 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     """Sets the single file processing parameter.
 
     Args:
-      single_file: boolean value, if set to True the tool treats the
-                   source as a single file input, otherwise as a storage
-                   media format.
+      single_file (Optional[bool]): True if source is a single file input,
+          False otherwise for example if source is a storage media format.
     """
     self._single_file = single_file
 
@@ -545,24 +552,22 @@ class PregFrontend(extraction_frontend.ExtractionFrontend):
     """Sets the source path.
 
     Args:
-      source_path: the filesystem path to the disk image.
+      source_path (str): path of the source.
     """
     self._source_path = source_path
 
   def SetSourcePathSpecs(self, source_path_specs):
-    """Sets the source path resolver.
+    """Sets the source path specifications.
 
     Args:
-      source_path_specs: list of source path specifications (instance
-                         of PathSpec).
+      source_path_specs (list[dfvfs.PathSpec]): source path specifications.
     """
     self._source_path_specs = source_path_specs
 
   def SetKnowledgeBase(self, knowledge_base_object):
-    """Sets the knowledge base object for the front end.
+    """Sets the knowledge base.
 
     Args:
-      knowledge_base_object: the knowledge base object (instance
-                             of KnowledgeBase).
+      knowledge_base_object (plaso.KnowledgeBase): knowledge base.
     """
     self.knowledge_base_object = knowledge_base_object

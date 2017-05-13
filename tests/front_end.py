@@ -75,6 +75,12 @@ class PregFrontendTest(test_lib.BaseTestCase):
     test_front_end.SetSourcePathSpecs([scan_node.path_spec])
     return test_front_end
 
+  # TODO: add tests for __init__
+  # TODO: add tests for properties
+  # TODO: add tests for _CreateWindowsPathResolver
+  # TODO: add tests for _GetRegistryHelperFromPath
+  # TODO: add tests for _GetSourceFileSystem
+
   @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testExpandKeysRedirect(self):
     """Tests the ExpandKeysRedirect function."""
@@ -168,6 +174,12 @@ class PregFrontendTest(test_lib.BaseTestCase):
 
     self.assertIn(u'userassist', other_plugin_names)
 
+  # TODO: add tests for GetRegistryPluginsFromRegistryType
+  # TODO: add tests for GetRegistryTypes
+  # TODO: add tests for GetWindowsRegistryPlugins
+
+  # TODO: split tests for ParseRegistryFile and ParseRegistryKey
+
   @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testParseRegistry(self):
     """Tests the ParseRegistryFile and ParseRegistryKey functions."""
@@ -233,6 +245,11 @@ class PregFrontendTest(test_lib.BaseTestCase):
       parsed_key_event_values = parsed_key_event.CopyToDict()
 
       self.assertEqual(event_values, parsed_key_event_values)
+
+  # TODO: add tests for SetSingleFile
+  # TODO: add tests for SetSourcePath
+  # TODO: add tests for SetSourcePathSpecs
+  # TODO: add tests for SetKnowledgeBase
 
 
 if __name__ == '__main__':
