@@ -1,0 +1,15 @@
+include ACKNOWLEDGEMENTS AUTHORS LICENSE README
+include run_tests.py
+include utils/check_dependencies.py
+recursive-include config *
+recursive-include data *
+recursive-include doc *
+# Do not include the test data otherwise the sdist will be too large for PyPi.
+recursive-exclude test_data *
+exclude .gitignore
+exclude *.pyc
+recursive-exclude l2tpreg *.pyc
+# The test scripts are not required in a binary distribution package they 
+# are considered source distribution files and excluded in find_package()
+# in setup.py.
+recursive-include tests *.py *.sh

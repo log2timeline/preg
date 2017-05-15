@@ -14,7 +14,7 @@ import re
 # property or method.
 PYTHON_DEPENDENCIES = {
     u'IPython': (u'__version__', u'1.2.1', None, True),
-    u'plaso': (u'__version__', u'1.5.1', None, True)}
+    u'plaso': (u'__version__', u'20170513', None, True)}
 
 PYTHON_TEST_DEPENDENCIES = {
     u'mock': (u'__version__', u'0.7.1', None, True)}

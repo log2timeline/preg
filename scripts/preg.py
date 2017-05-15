@@ -1,12 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Parse your Windows Registry files using preg.
+"""Interactive Windows Registry analysis tool.
 
-preg is a simple Windows Registry parser using the plaso Registry plugins and
-image parsing capabilities. It uses the back-end libraries of plaso to read
-raw image files and extract Registry files from VSS and restore points and then
-runs the Registry plugins of plaso against the Registry hive and presents it
-in a textual format.
+preg is an interactive Windows Registry analysis tool that utilizes
+plaso Windows Registry parser plugins, dfwinreg Windows Registry and
+dfvfs storage media image capabilities.
 """
 
 from __future__ import print_function
