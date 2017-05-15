@@ -128,27 +128,27 @@ if version_tuple[0] == 2:
   sys.setdefaultencoding(encoding)
 
 
-preg_version = l2tpreg.__version__
+l2tpreg_version = l2tpreg.__version__
 
 # Command bdist_msi does not support the library version, neither a date
 # as a version but if we suffix it with .1 everything is fine.
 if 'bdist_msi' in sys.argv:
-  preg_version += '.1'
+  l2tpreg_version += '.1'
 
-preg_description = 'Interactive Windows Registry analysis tool'
+l2tpreg_description = 'Interactive Windows Registry analysis tool'
 
-preg_long_description = (
-    'preg is an interactive Windows Registry analysis tool that utilizes '
-    'plaso Windows Registry parser plugins, dfwinreg Windows Registry and '
-    'dfvfs storage media image capabilities.')
+l2tpreg_long_description = (
+    'log2timeline preg is an interactive Windows Registry analysis tool that '
+    'utilizes plaso Windows Registry parser plugins, dfwinreg Windows '
+    'Registry and dfvfs storage media image capabilities.')
 
 setup(
-    name='preg',
-    version=preg_version,
-    description=preg_description,
-    long_description=preg_long_description,
+    name='l2tpreg',
+    version=l2tpreg_version,
+    description=l2tpreg_description,
+    long_description=l2tpreg_long_description,
     license='Apache License, Version 2.0',
-    url='https://github.com/log2timeline/preg',
+    url='https://github.com/log2timeline/l2tpreg',
     maintainer='Log2Timeline maintainers',
     maintainer_email='log2timeline-maintainers@googlegroups.com',
     scripts=[os.path.join('scripts', 'preg.py')],
@@ -164,10 +164,10 @@ setup(
     packages=find_packages('.', exclude=[
         'docs', 'scripts', 'tests', 'tests.*', 'utils']),
     package_dir={
-        'preg': 'preg',
+        'l2tpreg': 'l2tpreg',
     },
     data_files=[
-        ('share/doc/preg', [
+        ('share/doc/l2tpreg', [
             'AUTHORS', 'ACKNOWLEDGEMENTS', 'LICENSE', 'README']),
     ],
 )
