@@ -10,9 +10,7 @@ L2TBINARIES_TEST_DEPENDENCIES="funcsigs mock pbr";
 
 PYTHON2_DEPENDENCIES="ipython libbde-python libesedb-python libevt-python libevtx-python libewf-python libfsntfs-python libfvde-python libfwnt-python libfwsi-python liblnk-python libmsiecf-python libolecf-python libqcow-python libregf-python libscca-python libsigscan-python libsmdev-python libsmraw-python libvhdi-python libvmdk-python libvshadow-python libvslvm-python python-artifacts python-bencode python-binplist python-construct python-crypto python-dateutil python-dfdatetime python-dfvfs python-dfwinreg python-dpkt python-efilter python-hachoir-core python-hachoir-metadata python-hachoir-parser python-lzma python-pefile python-plaso python-psutil python-pyparsing python-pysqlite python-pytsk3 python-requests python-six python-tz python-xlsxwriter python-yaml python-yara python-zmq";
 
-PYTHON3_DEPENDENCIES="ipython3 libbde-python3 libesedb-python3 libevt-python3 libevtx-python3 libewf-python3 libfsntfs-python3 libfvde-python3 libfwnt-python3 libfwsi-python3 liblnk-python3 libmsiecf-python3 libolecf-python3 libqcow-python3 libregf-python3 libscca-python3 libsigscan-python3 libsmdev-python3 libsmraw-python3 libvhdi-python3 libvmdk-python3 libvshadow-python3 libvslvm-python3 python3-artifacts python3-bencode python3-construct python3-crypto python3-dateutil python3-dfdatetime python3-dfvfs python3-dfwinreg python3-dpkt python3-efilter python3-plaso python3-psutil python3-pyparsing python3-pytsk3 python3-requests python3-six python3-tz python3-xlsxwriter python3-yaml python3-yara python3-zmq";
-
-PYTHON_TEST_DEPENDENCIES="python-mock";
+PYTHON2_TEST_DEPENDENCIES="python-mock";
 
 # Exit on error.
 set -e;
@@ -26,19 +24,13 @@ then
 
 	PYTHONPATH=../l2tdevtools ../l2tdevtools/tools/update.py --download-directory=dependencies ${L2TBINARIES_DEPENDENCIES} ${L2TBINARIES_TEST_DEPENDENCIES};
 
-elif test ${TRAVIS_OS_NAME} = "linux" &&  test ${TRAVIS_PYTHON_VERSION} = "2.7";
+elif test ${TRAVIS_OS_NAME} = "linux";
 then
 	sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list;
 
 	sudo add-apt-repository ppa:gift/dev -y;
 	sudo apt-get update -q;
-	sudo apt-get install -y ${COVERALL_DEPENDENCIES} ${PYTHON2_DEPENDENCIES} ${PYTHON_TEST_DEPENDENCIES};
-
-elif test ${TRAVIS_OS_NAME} = "linux" &&  test ${TRAVIS_PYTHON_VERSION} = "3.4";
-then
-	sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list;
-
-	sudo add-apt-repository ppa:gift/dev -y;
-	sudo apt-get update -q;
-	sudo apt-get install -y ${COVERALL_DEPENDENCIES} ${PYTHON3_DEPENDENCIES} ${PYTHON_TEST_DEPENDENCIES};
+	# Only install the Python 2 dependencies.
+	# Also see: https://docs.travis-ci.com/user/languages/python/#Travis-CI-Uses-Isolated-virtualenvs
+	sudo apt-get install -y ${COVERALL_DEPENDENCIES} ${PYTHON2_DEPENDENCIES} ${PYTHON2_TEST_DEPENDENCIES};
 fi
