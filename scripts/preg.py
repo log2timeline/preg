@@ -45,6 +45,7 @@ from plaso.lib import timelib
 
 from l2tpreg import front_end
 from l2tpreg import helper
+from l2tpreg import plugin_list
 
 
 # Older versions of IPython don't have a version_info attribute.
@@ -856,7 +857,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
             registry_helper.file_type)
 
         for plugin in plugins_to_run:
-          key_paths = plugin.GetKeyPaths()
+          key_paths = plugin_list.PluginList.GetKeyPathsFromPlugin(plugin)
           self._front_end.ExpandKeysRedirect(key_paths)
           for key_path in key_paths:
             key = registry_helper.GetKeyByPath(key_path)
@@ -1228,7 +1229,7 @@ class PregMagics(magic.Magics):
               plugin_name, registry_file_type))
       return
 
-    key_paths = plugin_object.GetKeyPaths()
+    key_paths = plugin_list.PluginList.GetKeyPathsFromPlugin(plugin_object)
     if not key_paths:
       self.output_writer.Write(
           u'Plugin: {0:s} has no key information.\n'.format(line))

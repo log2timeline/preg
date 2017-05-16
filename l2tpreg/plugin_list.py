@@ -91,15 +91,32 @@ class PluginList(object):
     """
     key_paths = set()
     for plugin_cls in self.GetAllPlugins():
-      plugin_object = plugin_cls()
-
-      if plugin_names and plugin_object.NAME not in plugin_names:
+      if plugin_names and plugin_cls.NAME not in plugin_names:
         continue
 
-      for key_path in plugin_object.GetKeyPaths():
-        key_paths.add(key_path)
+      plugin_key_paths = PluginList.GetKeyPathsFromPlugin(plugin_cls)
+      key_paths = key_paths.union(plugin_key_paths)
 
     return key_paths
+
+  @classmethod
+  def GetKeyPathsFromPlugin(cls, plugin_cls):
+    """Retrieves a list of Windows Registry key paths from a plugin.
+
+    Args:
+      plugin_cls (type): Windows Registry plugin.
+
+    Returns:
+      list[str]: Windows Registry key paths.
+    """
+    key_paths = []
+    for registry_key_filter in plugin_cls.FILTERS:
+      plugin_key_paths = getattr(registry_key_filter, u'key_paths', [])
+      for plugin_key_path in plugin_key_paths:
+        if plugin_key_path not in key_paths:
+          key_paths.append(plugin_key_path)
+
+    return sorted(key_paths)
 
   def GetPluginObjectByName(self, registry_file_type, plugin_name):
     """Retrieves a specific Windows Registry plugin.

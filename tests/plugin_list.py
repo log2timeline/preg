@@ -22,6 +22,7 @@ class PluginListTest(test_lib.BaseTestCase):
   # TODO: add tests for AddPlugin
   # TODO: add tests for GetAllPlugins
   # TODO: add tests for GetKeyPaths
+  # TODO: add tests for GetKeyPathsFromPlugin
   # TODO: add tests for GetPluginObjectByName
   # TODO: add tests for GetPluginObjects
   # TODO: add tests for GetPlugins
