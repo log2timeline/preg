@@ -18,5 +18,5 @@ if __name__ == u'__main__':
     build_instructions_url = (
         u'https://github.com/log2timeline/plaso/wiki/Users-Guide')
 
-    print(u'See: {0:s} on how to set up plaso.'.format(build_instructions_url))
+    print(u'See: {0:s} on how to set up l2tpreg.'.format(build_instructions_url))
     print(u'')
