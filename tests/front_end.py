@@ -193,8 +193,9 @@ class PregFrontendTest(test_lib.BaseTestCase):
     key_list = []
     plugin_list = []
     for plugin in plugins:
-      plugin_list.append(plugin.NAME)
-      key_list.extend(plugin.GetKeyPaths())
+      for key_filter in plugin.FILTERS:
+        plugin_list.append(plugin.NAME)
+        key_list.extend(key_filter.key_paths)
 
     test_front_end.ExpandKeysRedirect(key_list)
 

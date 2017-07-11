@@ -39,8 +39,8 @@ from plaso.cli import storage_media_tool
 from plaso.cli import tools as cli_tools
 from plaso.cli import views as cli_views
 from plaso.engine import knowledge_base
+from plaso.lib import definitions as plaso_definitions
 from plaso.lib import errors
-from plaso.lib import eventdata
 from plaso.lib import timelib
 
 from l2tpreg import front_end
@@ -154,35 +154,34 @@ class PregTool(storage_media_tool.StorageMediaTool):
     self.source_type = None
 
   def _GetEventDataHexDump(
-      self, event_object, before=0, maximum_number_of_lines=20):
+      self, event, before=0, maximum_number_of_lines=20):
     """Returns a hexadecimal representation of the event data.
 
      This function creates a hexadecimal string representation based on
      the event data described by the event object.
 
     Args:
-      event_object: The event object (instance of EventObject).
-      before: Optional number of bytes to include in the output before
-              the event.
-      maximum_number_of_lines: Optional maximum number of lines to include
-                               in the output.
+      event (EventObject): event.
+      before (Optional[int]): number of bytes to include in the output before
+          the event.
+      maximum_number_of_lines (Optional[int]): maximum number of lines to
+          include in the output.
 
     Returns:
-      A string that contains the hexadecimal representation of the event data.
+      str: hexadecimal representation of the event data.
     """
-    if not event_object:
-      return u'Missing event object.'
+    if not event:
+      return u'Missing event.'
 
-    if not hasattr(event_object, u'pathspec'):
-      return u'Event object has no path specification.'
+    if not hasattr(event, u'pathspec'):
+      return u'Event has no path specification.'
 
     try:
-      file_entry = path_spec_resolver.Resolver.OpenFileEntry(
-          event_object.pathspec)
+      file_entry = path_spec_resolver.Resolver.OpenFileEntry(event.pathspec)
     except IOError as exception:
       return u'Unable to open file with error: {0:s}'.format(exception)
 
-    offset = getattr(event_object, u'offset', 0)
+    offset = getattr(event, u'offset', 0)
     if offset - before > 0:
       offset -= before
 
@@ -194,22 +193,22 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     return hexdump.Hexdump.FormatData(data)
 
-  def _GetFormatString(self, event_object):
+  def _GetFormatString(self, event):
     """Retrieves the format string for a given event object.
 
     Args:
-      event_object: an event object (instance of EventObject).
+      event (EventObject): event.
 
     Returns:
-      A string containing the format string.
+      str: format string.
     """
     # Go through the attributes and see if there is an attribute
     # value that is longer than the default font align length, and adjust
     # it accordingly if found.
-    if hasattr(event_object, u'regvalue'):
-      attributes = event_object.regvalue.keys()
+    if hasattr(event, u'regvalue'):
+      attributes = event.regvalue.keys()
     else:
-      attribute_names = set(event_object.GetAttributeNames())
+      attribute_names = set(event.GetAttributeNames())
       attributes = attribute_names.difference(
           self._EXCLUDED_ATTRIBUTE_NAMES)
 
@@ -344,35 +343,35 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     return False, u'Not an existing file.'
 
-  def _PrintEventBody(self, event_object, file_entry=None, show_hex=False):
+  def _PrintEventBody(self, event, file_entry=None, show_hex=False):
     """Writes a list of strings extracted from an event to an output writer.
 
     Args:
-      event_object: event object (instance of EventObject).
-      file_entry: optional file entry object (instance of dfvfs.FileEntry)
-                  that the event originated from. Default is None.
-      show_hex: optional boolean to indicate that the hexadecimal representation
-                of the event should be included in the output.
+      event (EventObject): event.
+      file_entry (Optional[dfvfs.FileEntry]): file entry from which the event
+          originated from.
+      show_hex (Optional[bool]): True if the hexadecimal representation of
+          the event data should be included in the output.
     """
-    format_string = self._GetFormatString(event_object)
+    format_string = self._GetFormatString(event)
 
     timestamp_description = getattr(
-        event_object, u'timestamp_desc', eventdata.EventTimestamp.WRITTEN_TIME)
+        event, u'timestamp_desc', plaso_definitions.TIME_DESCRIPTION_WRITTEN)
 
-    if timestamp_description != eventdata.EventTimestamp.WRITTEN_TIME:
+    if timestamp_description != plaso_definitions.TIME_DESCRIPTION_WRITTEN:
       self._output_writer.Write(u'<{0:s}>\n'.format(timestamp_description))
 
-    if hasattr(event_object, u'regvalue'):
-      attributes = event_object.regvalue
+    if hasattr(event, u'regvalue'):
+      attributes = event.regvalue
     else:
       # TODO: Add a function for this to avoid repeating code.
-      attribute_names = set(event_object.GetAttributeNames())
+      attribute_names = set(event.GetAttributeNames())
       keys = attribute_names.difference(self._EXCLUDED_ATTRIBUTE_NAMES)
       keys.discard(u'offset')
       keys.discard(u'timestamp_desc')
       attributes = {}
       for key in keys:
-        attributes[key] = getattr(event_object, key)
+        attributes[key] = getattr(event, key)
 
     for attribute, value in attributes.items():
       self._output_writer.Write(u'\t')
@@ -380,48 +379,46 @@ class PregTool(storage_media_tool.StorageMediaTool):
       self._output_writer.Write(u'\n')
 
     if show_hex and file_entry:
-      event_object.pathspec = file_entry.path_spec
-      hexadecimal_output = self._GetEventDataHexDump(event_object)
+      event.pathspec = file_entry.path_spec
+      hexadecimal_output = self._GetEventDataHexDump(event)
 
       self.PrintHeader(u'Hexadecimal output from event.', character=u'-')
       self._output_writer.Write(hexadecimal_output)
       self._output_writer.Write(u'\n')
 
-  def _PrintEventHeader(self, event_object, descriptions, exclude_timestamp):
+  def _PrintEventHeader(self, event, descriptions, exclude_timestamp):
     """Writes a list of strings that contains a header for the event.
 
     Args:
-      event_object: event object (instance of EventObject).
-      descriptions: list of strings describing the value of the header
-                    timestamp.
-      exclude_timestamp: boolean. If it is set to True the method
-                         will not include the timestamp in the header.
+      event (EventObject): event.
+      descriptions (list[str]): descriptions of the timestamps.
+      exclude_timestamp (bool): True if the timestamp should not be included
+          in the header.
     """
-    format_string = self._GetFormatString(event_object)
+    format_string = self._GetFormatString(event)
 
     self._output_writer.Write(u'Key information.\n')
     if not exclude_timestamp:
       for description in descriptions:
-        self._output_writer.Write(format_string.format(
-            description, timelib.Timestamp.CopyToIsoFormat(
-                event_object.timestamp)))
+        date_time_string = timelib.Timestamp.CopyToIsoFormat(event.timestamp)
+        output_text = format_string.format(description, date_time_string)
+        self._output_writer.Write(output_text)
         self._output_writer.Write(u'\n')
 
-    key_path = getattr(event_object, u'key_path', None)
+    key_path = getattr(event, u'key_path', None)
     if key_path:
       output_string = format_string.format(u'Key Path', key_path)
       self._output_writer.Write(output_string)
       self._output_writer.Write(u'\n')
 
-    if event_object.timestamp_desc != eventdata.EventTimestamp.WRITTEN_TIME:
+    if event.timestamp_desc != plaso_definitions.TIME_DESCRIPTION_WRITTEN:
       self._output_writer.Write(format_string.format(
-          u'Description', event_object.timestamp_desc))
+          u'Description', event.timestamp_desc))
       self._output_writer.Write(u'\n')
 
     self.PrintHeader(u'Data', character=u'+')
 
-  def _PrintEventObjectsBasedOnTime(
-      self, event_objects, file_entry, show_hex=False):
+  def _PrintEventObjectsBasedOnTime(self, events, file_entry, show_hex=False):
     """Write extracted data from a list of event objects to an output writer.
 
     This function groups together a list of event objects based on timestamps.
@@ -429,19 +426,19 @@ class PregTool(storage_media_tool.StorageMediaTool):
     itself is not repeated.
 
     Args:
-      event_objects: list of event objects (instance of EventObject).
-      file_entry: optional file entry object (instance of dfvfs.FileEntry).
-                  Defaults to None.
-      show_hex: optional boolean to indicate that the hexadecimal representation
-                of the event should be included in the output.
+      events (list[EventObject]): events.
+      file_entry (Optional[dfvfs.FileEntry]): file entry from which the event
+          originated from.
+      show_hex (Optional[bool]): True if the hexadecimal representation of
+          the event data should be included in the output.
     """
-    event_objects_and_timestamps = {}
-    for event_object in event_objects:
-      timestamp = event_object.timestamp
-      _ = event_objects_and_timestamps.setdefault(timestamp, [])
-      event_objects_and_timestamps[timestamp].append(event_object)
+    events_and_timestamps = {}
+    for event in events:
+      timestamp = event.timestamp
+      _ = events_and_timestamps.setdefault(timestamp, [])
+      events_and_timestamps[timestamp].append(event)
 
-    list_of_timestamps = sorted(event_objects_and_timestamps.keys())
+    list_of_timestamps = sorted(events_and_timestamps.keys())
 
     if len(list_of_timestamps) > 1:
       exclude_timestamp_in_header = True
@@ -449,10 +446,10 @@ class PregTool(storage_media_tool.StorageMediaTool):
       exclude_timestamp_in_header = False
 
     first_timestamp = list_of_timestamps[0]
-    first_event = event_objects_and_timestamps[first_timestamp][0]
+    first_event = events_and_timestamps[first_timestamp][0]
     descriptions = set()
-    for event_object in event_objects_and_timestamps[first_timestamp]:
-      descriptions.add(getattr(event_object, u'timestamp_desc', u''))
+    for event in events_and_timestamps[first_timestamp]:
+      descriptions.add(getattr(event, u'timestamp_desc', u''))
     self._PrintEventHeader(
         first_event, list(descriptions), exclude_timestamp_in_header)
 
@@ -462,9 +459,9 @@ class PregTool(storage_media_tool.StorageMediaTool):
         output_text = u'\n[{0:s}]\n'.format(date_time_string)
         self._output_writer.Write(output_text)
 
-      for event_object in event_objects_and_timestamps[event_timestamp]:
+      for event in events_and_timestamps[event_timestamp]:
         self._PrintEventBody(
-            event_object, file_entry=file_entry, show_hex=show_hex)
+            event, file_entry=file_entry, show_hex=show_hex)
 
   def _PrintParsedRegistryFile(self, parsed_data, registry_helper):
     """Write extracted data from a Registry file to an output writer.
@@ -577,7 +574,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
                 of the event should be included in the output.
     """
     self.PrintHeader(u'Plugins', character=u'-')
-    for plugin, event_objects in iter(key_data.items()):
+    for plugin, events in iter(key_data.items()):
       # TODO: make this a table view.
       self.PrintHeader(u'Plugin: {0:s}'.format(plugin.plugin_name))
       self._output_writer.Write(u'{0:s}\n'.format(plugin.DESCRIPTION))
@@ -588,11 +585,11 @@ class PregTool(storage_media_tool.StorageMediaTool):
         for url in plugin.URLS:
           self._output_writer.Write(u'{0:>17s} {1:s}\n'.format(u'URL :', url))
 
-      if not event_objects:
+      if not events:
         continue
 
       self._PrintEventObjectsBasedOnTime(
-          event_objects, file_entry, show_hex=show_hex)
+          events, file_entry, show_hex=show_hex)
 
     self.PrintSeparatorLine()
     self._output_writer.Write(u'\n\n')
