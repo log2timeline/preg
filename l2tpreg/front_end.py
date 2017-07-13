@@ -11,7 +11,7 @@ from dfvfs.path import factory as path_spec_factory
 from dfvfs.resolver import resolver as path_spec_resolver
 
 from plaso.containers import sessions
-from plaso.frontend import extraction_frontend
+from plaso.frontend import frontend
 from plaso.lib import py2to3
 from plaso.parsers import mediator as parsers_mediator
 from plaso.parsers import manager as parsers_manager
@@ -25,15 +25,15 @@ from l2tpreg import helper
 from l2tpreg import plugin_list
 
 
-class PregFrontend(extraction_frontend.ExtractionFrontend):
-  """Class that implements the preg front-end.
+class PregFrontend(frontend.Frontend):
+  """Preg front-end.
 
   Attributes:
     knowledge_base_object (plaso.KnowledgeBase): knowledge base.
   """
 
   def __init__(self):
-    """Initializes a front-end object."""
+    """Initializes a preg front-end."""
     super(PregFrontend, self).__init__()
     self._mount_path_spec = None
     self._parse_restore_points = False
