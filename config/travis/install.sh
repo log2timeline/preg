@@ -17,7 +17,7 @@ set -e;
 
 if test ${TRAVIS_OS_NAME} = "osx";
 then
-	git clone -b dev https://github.com/log2timeline/l2tdevtools.git;
+	git clone https://github.com/log2timeline/l2tdevtools.git;
 
 	mv l2tdevtools ../;
 	mkdir dependencies;
