@@ -440,10 +440,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     list_of_timestamps = sorted(events_and_timestamps.keys())
 
-    if len(list_of_timestamps) > 1:
-      exclude_timestamp_in_header = True
-    else:
-      exclude_timestamp_in_header = False
+    exclude_timestamp_in_header = len(list_of_timestamps) > 1
 
     first_timestamp = list_of_timestamps[0]
     first_event = events_and_timestamps[first_timestamp][0]
