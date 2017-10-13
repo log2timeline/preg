@@ -153,6 +153,10 @@ class PregTool(storage_media_tool.StorageMediaTool):
     self.run_mode = None
     self.source_type = None
 
+  def artifacts_registry(self):
+    """artifacts.ArtifactDefinitionsRegistry]: artifact definitions registry."""
+    return self._artifacts_registry
+
   def _GetEventDataHexDump(
       self, event, before=0, maximum_number_of_lines=20):
     """Returns a hexadecimal representation of the event data.
@@ -996,7 +1000,7 @@ class PregMagics(magic.Magics):
     """Handles the hive scan action.
 
     Args:
-      line: the command line provide via the console.
+      line (str): command line provide via the console.
     """
     # Line contains: "scan REGISTRY_TYPES" where REGISTRY_TYPES is a comma
     # separated list.
@@ -1008,7 +1012,8 @@ class PregMagics(magic.Magics):
           string.strip() for string in registry_file_type_string.split(u',')]
 
     registry_helpers = self.console.preg_front_end.GetRegistryHelpers(
-        self._artifacts_registry, registry_file_types=registry_file_types)
+        self.console.preg_front_end.artifacts_registry,
+        registry_file_types=registry_file_types)
 
     for registry_helper in registry_helpers:
       self.console.AddRegistryHelper(registry_helper)
@@ -1031,7 +1036,7 @@ class PregMagics(magic.Magics):
 
     for registry_key in plugin_object.expanded_keys:
       table_view.AddRow([u'Registry Key', registry_key])
-    table_view.Write(self._output_writer)
+    table_view.Write(self.output_writer)
 
   def _SanitizeKeyPath(self, key_path):
     """Sanitizes a Windows Registry key path.
@@ -1208,7 +1213,7 @@ class PregMagics(magic.Magics):
   def ParseWithPlugin(self, line):
     """Parse a Registry key using a specific plugin."""
     if not self.console and not self.console.IsLoaded():
-      self._output_writer.Write(u'No hive loaded, unable to parse.\n')
+      self.output_writer.Write(u'No hive loaded, unable to parse.\n')
       return
 
     current_helper = self.console.current_helper
@@ -1571,7 +1576,8 @@ class PregConsole(object):
       registry_file_types = self.preg_front_end.GetRegistryTypes()
 
     registry_helpers = self.preg_front_end.GetRegistryHelpers(
-        self._artifacts_registry, plugin_names=self.preg_tool.plugin_names,
+        self.preg_front_end.artifacts_registry,
+        plugin_names=self.preg_tool.plugin_names,
         registry_file_types=registry_file_types)
 
     for registry_helper in registry_helpers:
