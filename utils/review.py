@@ -67,6 +67,9 @@ class CodeReviewHelper(CLIHelper):
   """Codereview upload.py command helper."""
 
   _REVIEWERS_PER_PROJECT = {
+      u'acstore': frozenset([
+          u'joachim.metz@gmail.com',
+          u'onager@deerpie.com']),
       u'dfdatetime': frozenset([
           u'joachim.metz@gmail.com',
           u'onager@deerpie.com']),
@@ -321,6 +324,7 @@ class CodeReviewHelper(CLIHelper):
     """
     if not self._access_token:
       # TODO: add support to get access token directly from user.
+      # pylint: disable=no-member
       self._access_token = utils.upload.GetAccessToken()
       if not self._access_token:
         logging.error(u'Unable to retrieve access token.')
@@ -943,6 +947,7 @@ class ProjectHelper(CLIHelper):
       u'Google Inc. (*@google.com)']
 
   SUPPORTED_PROJECTS = frozenset([
+      u'acstore',
       u'artifacts',
       u'dfdatetime',
       u'dfkinds',
@@ -1187,7 +1192,7 @@ class PylintHelper(CLIHelper):
     for filename in filenames:
       print(u'Checking: {0:s}'.format(filename))
 
-      command = u'pylint --rcfile=utils/pylintrc {0:s}'.format(filename)
+      command = u'pylint --rcfile=.pylintrc {0:s}'.format(filename)
       exit_code = subprocess.call(command, shell=True)
       if exit_code != 0:
         failed_filenames.append(filename)
