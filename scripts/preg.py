@@ -779,7 +779,6 @@ class PregTool(storage_media_tool.StorageMediaTool):
     source_path = None
     if image:
       # TODO: refactor, there should be no need for separate code paths.
-      super(PregTool, self).ParseOptions(options)
       source_path = image
       self._front_end.SetSingleFile(False)
     else:
