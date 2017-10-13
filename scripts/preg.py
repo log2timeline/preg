@@ -34,10 +34,10 @@ except ImportError:
 from IPython.config.loader import Config
 from IPython.core import magic
 
-from plaso.cli import hexdump
 from plaso.cli import storage_media_tool
 from plaso.cli import tools as cli_tools
 from plaso.cli import views as cli_views
+from plaso.cli.helpers import manager as helpers_manager
 from plaso.engine import knowledge_base
 from plaso.lib import definitions as plaso_definitions
 from plaso.lib import errors
@@ -45,6 +45,7 @@ from plaso.lib import timelib
 
 from l2tpreg import front_end
 from l2tpreg import helper
+from l2tpreg import hexdump
 from l2tpreg import plugin_list
 
 
@@ -127,18 +128,17 @@ class PregTool(storage_media_tool.StorageMediaTool):
       u'timestamp'])
 
   def __init__(self, input_reader=None, output_writer=None):
-    """Initializes the CLI tool object.
+    """Initializes the CLI tool.
 
     Args:
-      input_reader: optional input reader (instance of InputReader).
-                    The default is None which indicates the use of the stdin
-                    input reader.
-      output_writer: optional output writer (instance of OutputWriter).
-                     The default is None which indicates the use of the stdout
-                     output writer.
+      input_reader (Optional[InputReader]): input reader, where None indicates
+          that the stdin input reader should be used.
+      output_writer (Optional[OutputWriter]): output writer, where None
+          indicates that the stdout output writer should be used.
     """
     super(PregTool, self).__init__(
         input_reader=input_reader, output_writer=output_writer)
+    self._artifacts_registry = None
     self._front_end = front_end.PregFrontend()
     self._key_path = None
     self._knowledge_base_object = knowledge_base.KnowledgeBase()
@@ -688,6 +688,12 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     self.AddStorageMediaImageOptions(image_options)
 
+    extraction_group = argument_parser.add_argument_group(
+        'Extraction Arguments')
+
+    helpers_manager.ArgumentHelperManager.AddCommandLineArguments(
+        extraction_group, names=['artifact_definitions'])
+
     info_options = argument_parser.add_argument_group(u'Informational Options')
 
     info_options.add_argument(
@@ -777,6 +783,11 @@ class PregTool(storage_media_tool.StorageMediaTool):
       self._ParseInformationalOptions(options)
       source_path = registry_file
       self._front_end.SetSingleFile(True)
+
+    helpers_manager.ArgumentHelperManager.ParseOptions(
+        options, self, names=['artifact_definitions'])
+
+    self._front_end.artifacts_registry = self._artifacts_registry
 
     if source_path is None:
       raise errors.BadConfigOption(u'No source path set.')
