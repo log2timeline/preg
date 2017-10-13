@@ -4,6 +4,9 @@
 
 import unittest
 
+from artifacts import reader as artifacts_reader
+from artifacts import registry as artifacts_registry
+
 from dfvfs.helpers import source_scanner
 from dfvfs.lib import definitions as dfvfs_definitions
 from dfvfs.path import factory as path_spec_factory
@@ -114,16 +117,22 @@ class PregFrontendTest(test_lib.BaseTestCase):
     paths = test_front_end.GetRegistryFilePaths(registry_file_types)
     self.assertEqual(sorted(paths), sorted(expected_paths))
 
+  @test_lib.skipUnlessHasTestFile([u'artifacts'])
   @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   @test_lib.skipUnlessHasTestFile([u'registry_test.dd'])
   def testGetRegistryHelpers(self):
     """Tests the GetRegistryHelpers function."""
+    path = self._GetTestFilePath([u'artifacts'])
+    artifact_registry = artifacts_registry.ArtifactDefinitionsRegistry()
+    reader = artifacts_reader.YamlArtifactsReader()
+    artifact_registry.ReadFromDirectory(reader, path)
+
     test_front_end = self._ConfigureSingleFileTest()
     with self.assertRaises(ValueError):
-      test_front_end.GetRegistryHelpers()
+      test_front_end.GetRegistryHelpers(artifact_registry)
 
     registry_helpers = test_front_end.GetRegistryHelpers(
-        registry_file_types=[u'SYSTEM'])
+        artifact_registry, registry_file_types=[u'SYSTEM'])
 
     self.assertEqual(len(registry_helpers), 1)
 
@@ -134,7 +143,7 @@ class PregFrontendTest(test_lib.BaseTestCase):
 
     test_front_end = self._ConfigureStorageMediaFileTest()
     registry_helpers = test_front_end.GetRegistryHelpers(
-        registry_file_types=[u'NTUSER'])
+        artifact_registry, registry_file_types=[u'NTUSER'])
 
     self.assertEqual(len(registry_helpers), 3)
 
@@ -147,11 +156,11 @@ class PregFrontendTest(test_lib.BaseTestCase):
     registry_helper.Close()
 
     registry_helpers = test_front_end.GetRegistryHelpers(
-        plugin_names=[u'userassist'])
+        artifact_registry, plugin_names=[u'userassist'])
     self.assertEqual(len(registry_helpers), 3)
 
     registry_helpers = test_front_end.GetRegistryHelpers(
-        registry_file_types=[u'SAM'])
+        artifact_registry, registry_file_types=[u'SAM'])
     self.assertEqual(len(registry_helpers), 1)
 
     # TODO: Add a test for getting Registry helpers from a storage media file
@@ -180,13 +189,19 @@ class PregFrontendTest(test_lib.BaseTestCase):
 
   # TODO: split tests for ParseRegistryFile and ParseRegistryKey
 
+  @test_lib.skipUnlessHasTestFile([u'artifacts'])
   @test_lib.skipUnlessHasTestFile([u'SYSTEM'])
   def testParseRegistry(self):
     """Tests the ParseRegistryFile and ParseRegistryKey functions."""
+    path = self._GetTestFilePath([u'artifacts'])
+    artifact_registry = artifacts_registry.ArtifactDefinitionsRegistry()
+    reader = artifacts_reader.YamlArtifactsReader()
+    artifact_registry.ReadFromDirectory(reader, path)
+
     test_front_end = self._ConfigureSingleFileTest()
 
     registry_helpers = test_front_end.GetRegistryHelpers(
-        registry_file_types=[u'SYSTEM'])
+        artifact_registry, registry_file_types=[u'SYSTEM'])
     registry_helper = registry_helpers[0]
 
     plugins = test_front_end.GetRegistryPluginsFromRegistryType(u'SYSTEM')

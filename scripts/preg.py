@@ -688,6 +688,12 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     self.AddStorageMediaImageOptions(image_options)
 
+    processing_group = argument_parser.add_argument_group(
+        'Processing Arguments')
+
+    helpers_manager.ArgumentHelperManager.AddCommandLineArguments(
+        processing_group, names=['data_location'])
+
     extraction_group = argument_parser.add_argument_group(
         'Extraction Arguments')
 
@@ -785,9 +791,10 @@ class PregTool(storage_media_tool.StorageMediaTool):
       self._front_end.SetSingleFile(True)
 
     helpers_manager.ArgumentHelperManager.ParseOptions(
-        options, self, names=['artifact_definitions'])
+        options, self, names=['data_location'])
 
-    self._front_end.artifacts_registry = self._artifacts_registry
+    helpers_manager.ArgumentHelperManager.ParseOptions(
+        options, self, names=['artifact_definitions'])
 
     if source_path is None:
       raise errors.BadConfigOption(u'No source path set.')
@@ -854,7 +861,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     them, one by one.
     """
     registry_helpers = self._front_end.GetRegistryHelpers(
-        registry_file_types=[self.registry_file])
+        self._artifacts_registry, registry_file_types=[self.registry_file])
 
     for registry_helper in registry_helpers:
       try:
@@ -889,8 +896,8 @@ class PregTool(storage_media_tool.StorageMediaTool):
     all available plugins.
     """
     registry_helpers = self._front_end.GetRegistryHelpers(
-        registry_file_types=[self.registry_file],
-        plugin_names=self.plugin_names)
+        self._artifacts_registry, plugin_names=self.plugin_names,
+        registry_file_types=[self.registry_file])
 
     key_paths = [self._key_path]
 
@@ -907,7 +914,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     # TODO: Add support for splitting the output to separate files based on
     # each plugin name.
     registry_helpers = self._front_end.GetRegistryHelpers(
-        plugin_names=self.plugin_names)
+        self._artifacts_registry, plugin_names=self.plugin_names)
 
     plugins = []
     for plugin_name in self.plugin_names:
@@ -1005,7 +1012,7 @@ class PregMagics(magic.Magics):
           string.strip() for string in registry_file_type_string.split(u',')]
 
     registry_helpers = self.console.preg_front_end.GetRegistryHelpers(
-        registry_file_types=registry_file_types)
+        self._artifacts_registry, registry_file_types=registry_file_types)
 
     for registry_helper in registry_helpers:
       self.console.AddRegistryHelper(registry_helper)
@@ -1568,8 +1575,8 @@ class PregConsole(object):
       registry_file_types = self.preg_front_end.GetRegistryTypes()
 
     registry_helpers = self.preg_front_end.GetRegistryHelpers(
-        registry_file_types=registry_file_types,
-        plugin_names=self.preg_tool.plugin_names)
+        self._artifacts_registry, plugin_names=self.preg_tool.plugin_names,
+        registry_file_types=registry_file_types)
 
     for registry_helper in registry_helpers:
       self.AddRegistryHelper(registry_helper)

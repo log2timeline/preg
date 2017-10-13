@@ -28,8 +28,6 @@ class PregFrontend(object):
   """Preg front-end.
 
   Attributes:
-    artifacts_registry (artifacts.ArtifactDefinitionsRegistry]): artifact
-        definitions registry.
     knowledge_base_object (plaso.KnowledgeBase): knowledge base.
   """
 
@@ -45,7 +43,6 @@ class PregFrontend(object):
     self._source_path = None
     self._source_path_specs = []
 
-    self.artifacts_registry = None
     self.knowledge_base_object = None
 
   @property
@@ -279,10 +276,13 @@ class PregFrontend(object):
 
   # TODO: refactor this function. Current implementation is too complex.
   def GetRegistryHelpers(
-      self, registry_file_types=None, plugin_names=None, codepage=u'cp1252'):
+      self, artifacts_registry, registry_file_types=None, plugin_names=None,
+      codepage=u'cp1252'):
     """Retrieves discovered Windows Registry helpers.
 
     Args:
+    artifacts_registry (artifacts.ArtifactDefinitionsRegistry]): artifact
+        definitions registry.
       registry_file_types (Optional[list[str]]): of Windows Registry file types,
           for example "NTUSER" or "SAM" that should be included.
       plugin_names (Optional[str]): names of the plugins or an empty string for
@@ -311,7 +311,7 @@ class PregFrontend(object):
           self._source_path_specs[0])
       try:
         preprocess_manager.PreprocessPluginsManager.RunPlugins(
-            self.artifacts_registry, file_system, mount_point,
+            artifacts_registry, file_system, mount_point,
             self.knowledge_base_object)
         self._preprocess_completed = True
       finally:
