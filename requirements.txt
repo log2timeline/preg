@@ -2,18 +2,22 @@ pip >= 7.0.0
 IPython >= 1.2.1
 PyYAML >= 3.10
 XlsxWriter >= 0.9.3
-artifacts >= 20150409
-bencode
+artifacts >= 20170818
+bencode.py
 binplist >= 0.1.4
+certifi >= 2016.9.26
+chardet >= 2.0.1
 construct >= 2.5.2,<= 2.5.3
-dfdatetime >= 20170103
+dfdatetime >= 20170529
 dfvfs >= 20160803
-dfwinreg >= 20160320
+dfwinreg >= 20170521
 dpkt >= 1.8
 efilter == 1-1.5
+future >= 0.16.0
 hachoir-core >= 1.3.3 ; python_version < '3.0'
 hachoir-metadata >= 1.3.3 ; python_version < '3.0'
 hachoir-parser >= 1.3.4 ; python_version < '3.0'
+idna >= 2.5
 libbde-python >= 20140531
 libesedb-python >= 20150409
 libevt-python >= 20120410
@@ -36,7 +40,7 @@ libvhdi-python >= 20131210
 libvmdk-python >= 20140421
 libvshadow-python >= 20160109
 libvslvm-python >= 20160109
-pefile >= 1.2.10-139
+pefile >= 2017.5.26
 plaso >= 20170928
 psutil >= 1.2.1
 pycrypto >= 2.6.0
@@ -48,4 +52,5 @@ pytz
 pyzmq >= 2.1.11
 requests >= 2.2.1
 six >= 1.1.0
+urllib3 >= 1.7.1
 yara-python >= 3.4.0
