@@ -8,7 +8,6 @@ from __future__ import unicode_literals
 
 import abc
 import argparse
-import difflib
 import logging
 import os
 import shutil
@@ -23,7 +22,7 @@ except ImportError:
 
 
 if sys.version_info[0] < 3:
-  STRING_TYPES = (basestring, )
+  STRING_TYPES = (basestring, )  # pylint: disable=undefined-variable
 else:
   STRING_TYPES = (str, )
 
@@ -321,6 +320,7 @@ class TestDefinitionReader(object):
     self._config_parser = configparser.RawConfigParser()
 
     try:
+      # pylint: disable=deprecated-method
       self._config_parser.readfp(file_object)
 
       for section_name in self._config_parser.sections():
