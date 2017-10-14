@@ -57,8 +57,7 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
     self._test_console = preg.PregConsole(self._test_tool)
     file_entry = self._GetTestFileEntry([u'NTUSER.DAT'])
     self._file_path = self._GetTestFilePath([u'NTUSER.DAT'])
-    self._registry_helper = helper.PregRegistryHelper(
-        file_entry, u'OS', self._test_tool._knowledge_base_object)
+    self._registry_helper = helper.PregRegistryHelper(file_entry, u'OS')
 
   def tearDown(self):
     """Tears down the needed ojects after a test."""
@@ -155,8 +154,6 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
     """Sets up the needed objects used throughout the test."""
     self._output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
     test_tool = preg_tool.PregTool(output_writer=self._output_writer)
-    front_end = getattr(test_tool, '_front_end', None)
-    front_end.SetKnowledgeBase(test_tool._knowledge_base_object)
 
     self._test_console = preg.PregConsole(test_tool)
     self._magic_obj = preg.PregMagics(None)
@@ -165,7 +162,7 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
 
     registry_file_entry = self._GetTestFileEntry([u'NTUSER.DAT'])
     self._registry_helper = helper.PregRegistryHelper(
-        registry_file_entry, u'OS', test_tool._knowledge_base_object)
+        registry_file_entry, u'OS')
 
     self._test_console.AddRegistryHelper(self._registry_helper)
     self._test_console.LoadRegistryFile(0)

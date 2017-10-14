@@ -47,7 +47,7 @@ if getattr(IPython, 'version_info', (0, 0, 0)) < (1, 2, 1):
 
 @magic.magics_class
 class PregMagics(magic.Magics):
-  """Class that implements the iPython console magic functions."""
+  """Preg iPython magics."""
 
   # Needed to give the magic class access to the front end tool
   # for processing and formatting.
@@ -65,7 +65,7 @@ class PregMagics(magic.Magics):
     """Handles the hive list action.
 
     Args:
-      line: the command line provide via the console.
+      line (str): command line provide via the console.
     """
     self.console.PrintRegistryFileList()
     self.output_writer.Write('\n')
@@ -76,7 +76,7 @@ class PregMagics(magic.Magics):
     """Handles the hive open action.
 
     Args:
-      line: the command line provide via the console.
+      line (str): command line provide via the console.
     """
     try:
       registry_file_index = int(line[5:], 10)
@@ -107,13 +107,13 @@ class PregMagics(magic.Magics):
     # separated list.
     registry_file_type_string = line[5:]
     if not registry_file_type_string:
-      registry_file_types = self.console.preg_front_end.GetRegistryTypes()
+      registry_file_types = self.console.preg_tool.GetRegistryTypes()
     else:
       registry_file_types = [
           string.strip() for string in registry_file_type_string.split(',')]
 
-    registry_helpers = self.console.preg_front_end.GetRegistryHelpers(
-        self.console.preg_front_end.artifacts_registry,
+    registry_helpers = self.console.preg_tool.GetRegistryHelpers(
+        self.console.preg_tool.artifacts_registry,
         registry_file_types=registry_file_types)
 
     for registry_helper in registry_helpers:
@@ -125,8 +125,7 @@ class PregMagics(magic.Magics):
     """Prints the help information of a plugin.
 
     Args:
-      plugin_object: a Windows Registry plugin object (instance of
-                     WindowsRegistryPlugin).
+      plugin_object (WindowsRegistryPlugin): a Windows Registry plugin.
     """
     table_view = cli_views.CLITableView(title=plugin_object.NAME)
 
@@ -143,10 +142,10 @@ class PregMagics(magic.Magics):
     """Sanitizes a Windows Registry key path.
 
     Args:
-      key_path: a string containing a Registry key path.
+      key_path (str): Windows Registry key path.
 
     Returns:
-      A string containing the sanitized Registry key path.
+      str: sanitized Windows Registry key path.
     """
     key_path = key_path.replace('}', '}}')
     key_path = key_path.replace('{', '{{')
@@ -162,7 +161,7 @@ class PregMagics(magic.Magics):
     to point to the root key.
 
     Args:
-      key_path: path to the key to traverse to.
+      key_path (str): Windows Registry key path to change to.
     """
     if not self.console and not self.console.IsLoaded():
       return
@@ -187,7 +186,7 @@ class PregMagics(magic.Magics):
     """Handles the hive actions.
 
     Args:
-      line: the command line provide via the console.
+      line (str): command line provide via the console.
     """
     if line.startswith('list'):
       self._HiveActionList(line)
@@ -200,7 +199,11 @@ class PregMagics(magic.Magics):
 
   @magic.line_magic('ls')
   def ListDirectoryContent(self, line):
-    """List all subkeys and values of the current key."""
+    """List all subkeys and values of the current key.
+
+    Args:
+      line (str): command line provide via the console.
+    """
     if not self.console and not self.console.IsLoaded():
       return
 
@@ -261,7 +264,11 @@ class PregMagics(magic.Magics):
 
   @magic.line_magic('parse')
   def ParseCurrentKey(self, line):
-    """Parse the current key."""
+    """Parse the current key.
+
+    Args:
+      line (str): command line provide via the console.
+    """
     if not self.console and not self.console.IsLoaded():
       return
 
@@ -277,7 +284,7 @@ class PregMagics(magic.Magics):
       return
 
     current_key = current_helper.GetCurrentRegistryKey()
-    parsed_data = self.console.preg_front_end.ParseRegistryKey(
+    parsed_data = self.console.preg_tool.ParseRegistryKey(
         current_key, current_helper)
 
     self.console.preg_tool.PrintParsedRegistryKey(
@@ -312,7 +319,11 @@ class PregMagics(magic.Magics):
 
   @magic.line_magic('plugin')
   def ParseWithPlugin(self, line):
-    """Parse a Registry key using a specific plugin."""
+    """Parses a Windows Registry key using a specific plugin.
+
+    Args:
+      line (str): command line provide via the console.
+    """
     if not self.console and not self.console.IsLoaded():
       self.output_writer.Write('No hive loaded, unable to parse.\n')
       return
@@ -366,14 +377,18 @@ class PregMagics(magic.Magics):
       self.ChangeDirectory(key_path)
       # Parse the key.
       current_key = current_helper.GetCurrentRegistryKey()
-      parsed_data = self.console.preg_front_end.ParseRegistryKey(
+      parsed_data = self.console.preg_tool.ParseRegistryKey(
           current_key, current_helper, use_plugins=[plugin_name])
       self.console.preg_tool.PrintParsedRegistryKey(
           parsed_data, file_entry=current_helper.file_entry)
 
   @magic.line_magic('pwd')
   def PrintCurrentWorkingDirectory(self, unused_line):
-    """Print the current path."""
+    """Print the current path.
+
+    Args:
+      line (str): command line provide via the console.
+    """
     if not self.console and not self.console.IsLoaded():
       return
 
@@ -386,7 +401,7 @@ class PregMagics(magic.Magics):
 
 
 class PregConsole(object):
-  """Class that implements the preg iPython console."""
+  """Preg iPython console."""
 
   _BASE_FUNCTIONS = [
       ('cd key', 'Navigate the Registry like a directory structure.'),
@@ -429,70 +444,52 @@ class PregConsole(object):
         encoding=preferred_encoding)
 
     self.preg_tool = tool
-    self.preg_front_end = getattr(tool, '_front_end', None)
 
   def _CommandGetCurrentKey(self):
-    """Command function to retrieve the currently loaded Registry key.
+    """Retreives the currently loaded Registry key.
 
     Returns:
-      The currently loaded Registry key (instance of dfwinreg.WinRegistryKey)
-      or None if there is no loaded key.
+      dfwinreg.WinRegistryKey: currently loaded Registry key or None if
+          not available.
     """
-    registry_helper = self._currently_registry_helper
-    return registry_helper.GetCurrentRegistryKey()
+    return self._currently_registry_helper.GetCurrentRegistryKey()
 
   def _CommandGetValue(self, value_name):
-    """Return a value object from the currently loaded Registry key.
+    """Retrieves a value from the currently loaded Windows Registry key.
 
     Args:
-      value_name: string containing the name of the value to be retrieved.
+      value_name (str): name of the value to be retrieved.
 
     Returns:
-      The Registry value (instance of dfwinreg.WinRegistryValue) if it exists,
-      None if either there is no currently loaded Registry key or if the value
-      does not exist.
+      dfwinreg.WinRegistryValue: a Windows Registry value, or None if not
+          available.
     """
-    registry_helper = self._currently_registry_helper
-
-    current_key = registry_helper.GetCurrentRegistryKey()
-    if not current_key:
-      return
-
-    return current_key.GetValueByName(value_name)
+    current_key = self._currently_registry_helper.GetCurrentRegistryKey()
+    if current_key:
+      return current_key.GetValueByName(value_name)
 
   def _CommandGetValueData(self, value_name):
-    """Return the value data from a value in the currently loaded Registry key.
+    """Retrieves a value data from the currently loaded Windows Registry key.
 
     Args:
-      value_name: string containing the name of the value to be retrieved.
+      value_name (str): name of the value to be retrieved.
 
     Returns:
-      The data from a Registry value if it exists, None if either there is no
-      currently loaded Registry key or if the value does not exist.
+      object: Windows Registry value data, or None if not available.
     """
     registry_value = self._CommandGetValue(value_name)
-    if not registry_value:
-      return
-
-    return registry_value.GetDataAsObject()
-
-  def _CommandGetRangeForAllLoadedHives(self):
-    """Return a range or a list of all loaded hives."""
-    return range(0, self._CommandGetTotalNumberOfLoadedHives())
-
-  def _CommandGetTotalNumberOfLoadedHives(self):
-    """Return the total number of Registry hives that are loaded."""
-    return len(self._registry_helpers)
+    if registry_value:
+      return registry_value.GetDataAsObject()
 
   def AddRegistryHelper(self, registry_helper):
     """Add a Registry helper to the console object.
 
     Args:
-      registry_helper: registry helper object (instance of PregRegistryHelper)
+      registry_helper (PregRegistryHelper): registry helper.
 
     Raises:
       ValueError: if not Registry helper is supplied or Registry helper is not
-                  the correct object (instance of PregRegistryHelper).
+          the correct object (instance of PregRegistryHelper).
     """
     if not registry_helper:
       raise ValueError('No Registry helper supplied.')
@@ -505,11 +502,10 @@ class PregConsole(object):
       self._registry_helpers[registry_helper.path] = registry_helper
 
   def GetConfig(self):
-    """Retrieves the iPython config.
+    """Retrieves the iPython configuration.
 
     Returns:
-      The IPython config object (instance of
-      IPython.terminal.embed.InteractiveShellEmbed)
+      IPython.terminal.embed.InteractiveShellEmbed: iPython configuration.
     """
     try:
       # The "get_ipython" function does not exist except within an IPython
@@ -522,8 +518,7 @@ class PregConsole(object):
     """Checks if a Windows Registry file is loaded.
 
     Returns:
-      True if a Registry helper is currently loaded and ready
-      to be used, otherwise False is returned.
+      bool: True if a Registry helper is currently loaded, False otherwise.
     """
     registry_helper = self._currently_registry_helper
     if not registry_helper:
@@ -580,15 +575,14 @@ class PregConsole(object):
     self._output_writer.Write('\nHappy command line console fu-ing.')
 
   def LoadRegistryFile(self, index):
-    """Load a Registry file helper from the list of Registry file helpers.
+    """Loads a Registry file helper from the list of Registry file helpers.
 
     Args:
-      index: index into the list of available Registry helpers.
+      index (int): index of the Registry helper.
 
     Raises:
       UnableToLoadRegistryHelper: if the index attempts to load an entry
-                                  that does not exist or if there are no
-                                  Registry helpers loaded.
+          that does not exist or if there are no Registry helpers loaded.
     """
     helper_keys = self._registry_helpers.keys()
 
@@ -609,7 +603,7 @@ class PregConsole(object):
     self._currently_registry_helper.Open()
 
   def PrintRegistryFileList(self):
-    """Write a list of all available registry helpers to an output writer."""
+    """Prints a list of all available registry helpers."""
     if not self._registry_helpers:
       return
 
@@ -632,14 +626,12 @@ class PregConsole(object):
     """Sets the prompt string on the console.
 
     Args:
-      registry_file_path: optional hive name or path of the Registry file. The
-                          default is None which sets the value to a string
-                          indicating an unknown Registry file.
-      config: optional IPython configuration object (instance of
-              IPython.terminal.embed.InteractiveShellEmbed).
-              and an attempt to automatically derive the config is done.
-      prepend_string: optional string that can be injected into the prompt
-                      just prior to the command count.
+      registry_file_path (Optional[str]): name or path of the Windows Registry
+          file.
+      config (Optional[IPython.terminal.embed.InteractiveShellEmbed]): iPython
+          configuration, where None will attempt to automatically derive
+          the configuration.
+      prepend_string (Optional[str]): text to prepend in the command prompt.
     """
     if registry_file_path is None:
       path_string = 'Unknown Registry file loaded'
@@ -674,10 +666,10 @@ class PregConsole(object):
       registry_file_types = [self.preg_tool.registry_file]
     else:
       # No Registry type specified use all available types instead.
-      registry_file_types = self.preg_front_end.GetRegistryTypes()
+      registry_file_types = self.preg_tool.GetRegistryTypes()
 
-    registry_helpers = self.preg_front_end.GetRegistryHelpers(
-        self.preg_front_end.artifacts_registry,
+    registry_helpers = self.preg_tool.GetRegistryHelpers(
+        self.preg_tool.artifacts_registry,
         plugin_names=self.preg_tool.plugin_names,
         registry_file_types=registry_file_types)
 
@@ -690,13 +682,10 @@ class PregConsole(object):
     namespace.update(globals())
     namespace.update({
         'console': self,
-        'front_end': self.preg_front_end,
         'get_current_key': self._CommandGetCurrentKey,
         'get_key': self._CommandGetCurrentKey,
         'get_value': self. _CommandGetValue,
         'get_value_data': self. _CommandGetValueData,
-        'number_of_hives': self._CommandGetTotalNumberOfLoadedHives,
-        'range_of_hives': self._CommandGetRangeForAllLoadedHives,
         'tool': self.preg_tool})
 
     ipshell_config = self.GetConfig()

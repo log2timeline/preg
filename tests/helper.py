@@ -14,7 +14,7 @@ class PregRegistryHelperTest(test_lib.BaseTestCase):
 
   def testInitialize(self):
     """Tests the __init__ function."""
-    test_helper = helper.PregRegistryHelper(None, None, None)
+    test_helper = helper.PregRegistryHelper(None, None)
     self.assertIsNotNone(test_helper)
 
   # TODO: add tests for __enter__.

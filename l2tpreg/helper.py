@@ -35,15 +35,12 @@ class PregRegistryHelper(object):
   }
 
   def __init__(
-      self, file_entry, collector_name, knowledge_base_object,
-      codepage='cp1252'):
+      self, file_entry, collector_name, codepage='cp1252'):
     """Initialize a Windows Registry helper.
 
     Args:
       file_entry (dfvfs.FileEntry): file entry.
       collector_name (str0: name of the collector, for example "TSK".
-      knowledge_base_object (plaso.KnowledgeBase): knowledge base, which
-          contains information from the source data needed for parsing.
       codepage (Optional[str]): codepage value used for the Windows Registry
           file.
     """
@@ -52,7 +49,6 @@ class PregRegistryHelper(object):
     self._collector_name = collector_name
     self._currently_registry_key = None
     self._key_path_prefix = None
-    self._knowledge_base_object = knowledge_base_object
     self._registry_file = None
     self._registry_file_name = None
     self._registry_file_type = definitions.REGISTRY_FILE_TYPE_UNKNOWN
