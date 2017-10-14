@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --buildsystem=python_distutils --with=python2
+
+.PHONY: override_dh_auto_clean
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf build l2tpreg.egg-info/SOURCES.txt l2tpreg.egg-info/PKG-INFO
+
+.PHONY: override_dh_auto_build
+override_dh_auto_build:
+	dh_auto_build
+
+.PHONY: override_dh_auto_install
+override_dh_auto_install:
+	dh_auto_install --destdir $(CURDIR)
+
