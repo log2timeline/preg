@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Class to represent binary data as hexadecimal."""
 
+from __future__ import unicode_literals
+
 
 class Hexdump(object):
   """Class that defines a hexadecimal representation formatter (hexdump)."""
@@ -22,14 +24,14 @@ class Hexdump(object):
       ValueError: if the data offset is out of bounds.
     """
     if data_offset < 0 or data_offset >= data_size:
-      raise ValueError(u'Data offset value out of bounds.')
+      raise ValueError('Data offset value out of bounds.')
 
     if data_size - data_offset > 16:
       data_size = data_offset + 16
 
     word_values = []
     for byte_offset in range(data_offset, data_size, 2):
-      word_value = u'{0:02x}{1:02x}'.format(
+      word_value = '{0:02x}{1:02x}'.format(
           ord(data[byte_offset]), ord(data[byte_offset + 1]))
       word_values.append(word_value)
 
@@ -39,12 +41,12 @@ class Hexdump(object):
       if byte_value > 31 and byte_value < 127:
         byte_value = data[byte_offset]
       else:
-        byte_value = u'.'
+        byte_value = '.'
 
       byte_values.append(byte_value)
 
-    return u'{0:07x}: {1:s}  {2:s}'.format(
-        data_offset, u' '.join(word_values), u''.join(byte_values))
+    return '{0:07x}: {1:s}  {2:s}'.format(
+        data_offset, ' '.join(word_values), ''.join(byte_values))
 
   @classmethod
   def FormatData(cls, data, data_offset=0, maximum_data_size=None):
@@ -73,4 +75,4 @@ class Hexdump(object):
       hexdump_line = cls._FormatDataLine(data, line_offset, data_size)
       output_strings.append(hexdump_line)
 
-    return u'\n'.join(output_strings)
+    return '\n'.join(output_strings)

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """List of plaso Windows Registry plugins."""
 
+from __future__ import unicode_literals
+
 from l2tpreg import definitions
 
 
@@ -33,7 +35,7 @@ class PluginList(object):
           specific Windows Registry file type.
     """
     return plugins_dict.get(
-        registry_file_type, []) + plugins_dict.get(u'any', [])
+        registry_file_type, []) + plugins_dict.get('any', [])
 
   def AddPlugin(self, plugin_class):
     """Adds a Windows Registry plugin to the list.
@@ -46,24 +48,24 @@ class PluginList(object):
     key_paths = []
     registry_file_types = set()
     for registry_key_filter in plugin_class.FILTERS:
-      plugin_key_paths = getattr(registry_key_filter, u'key_paths', [])
+      plugin_key_paths = getattr(registry_key_filter, 'key_paths', [])
       for plugin_key_path in plugin_key_paths:
         if plugin_key_path not in key_paths:
           key_paths.append(plugin_key_path)
 
-          if plugin_key_path.startswith(u'HKEY_CURRENT_USER'):
-            registry_file_types.add(u'NTUSER')
-          elif plugin_key_path.startswith(u'HKEY_LOCAL_MACHINE\\SAM'):
-            registry_file_types.add(u'SAM')
-          elif plugin_key_path.startswith(u'HKEY_LOCAL_MACHINE\\Software'):
-            registry_file_types.add(u'SOFTWARE')
-          elif plugin_key_path.startswith(u'HKEY_LOCAL_MACHINE\\System'):
-            registry_file_types.add(u'SYSTEM')
+          if plugin_key_path.startswith('HKEY_CURRENT_USER'):
+            registry_file_types.add('NTUSER')
+          elif plugin_key_path.startswith('HKEY_LOCAL_MACHINE\\SAM'):
+            registry_file_types.add('SAM')
+          elif plugin_key_path.startswith('HKEY_LOCAL_MACHINE\\Software'):
+            registry_file_types.add('SOFTWARE')
+          elif plugin_key_path.startswith('HKEY_LOCAL_MACHINE\\System'):
+            registry_file_types.add('SYSTEM')
 
     if len(registry_file_types) == 1:
       plugin_type = registry_file_types.pop()
     else:
-      plugin_type = u'any'
+      plugin_type = 'any'
 
     if key_paths:
       self._plugins.setdefault(plugin_type, []).append(plugin_class)
@@ -111,7 +113,7 @@ class PluginList(object):
     """
     key_paths = []
     for registry_key_filter in plugin_cls.FILTERS:
-      plugin_key_paths = getattr(registry_key_filter, u'key_paths', [])
+      plugin_key_paths = getattr(registry_key_filter, 'key_paths', [])
       for plugin_key_path in plugin_key_paths:
         if plugin_key_path not in key_paths:
           key_paths.append(plugin_key_path)
@@ -198,7 +200,7 @@ class PluginList(object):
     for plugin_type, plugins_per_type in iter(self._plugins.items()):
       for plugin in plugins_per_type:
         if not filter_string or filter_string == plugin.NAME.lower():
-          if plugin_type == u'any':
+          if plugin_type == 'any':
             registry_file_types.update(definitions.REGISTRY_FILE_TYPES)
 
           else:
@@ -224,7 +226,7 @@ class PluginList(object):
         if plugin.NAME.lower() in plugin_names:
           # If a plugin is available for every Registry type
           # we need to make sure all Registry files are included.
-          if plugin_type == u'any':
+          if plugin_type == 'any':
             registry_file_types.update(definitions.REGISTRY_FILE_TYPES)
 
           else:
@@ -247,7 +249,7 @@ class PluginList(object):
 
     plugins_to_run = []
     for plugin_type, plugins_per_type in iter(self._plugins.items()):
-      if not registry_file_type or plugin_type in (u'any', registry_file_type):
+      if not registry_file_type or plugin_type in ('any', registry_file_type):
         plugins_to_run.extend(plugins_per_type)
 
     return plugins_to_run

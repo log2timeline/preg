@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Windows Registry helper."""
 
+from __future__ import unicode_literals
+
 import logging
 
 from dfwinreg import registry as dfwinreg_registry
@@ -19,22 +21,22 @@ class PregRegistryHelper(object):
 
   _KEY_PATHS_PER_REGISTRY_TYPE = {
       definitions.REGISTRY_FILE_TYPE_NTUSER: frozenset([
-          u'\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer']),
+          '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer']),
       definitions.REGISTRY_FILE_TYPE_SAM: frozenset([
-          u'\\SAM\\Domains\\Account\\Users']),
+          '\\SAM\\Domains\\Account\\Users']),
       definitions.REGISTRY_FILE_TYPE_SECURITY: frozenset([
-          u'\\Policy\\PolAdtEv']),
+          '\\Policy\\PolAdtEv']),
       definitions.REGISTRY_FILE_TYPE_SOFTWARE: frozenset([
-          u'\\Microsoft\\Windows\\CurrentVersion\\App Paths']),
+          '\\Microsoft\\Windows\\CurrentVersion\\App Paths']),
       definitions.REGISTRY_FILE_TYPE_SYSTEM: frozenset([
-          u'\\Select']),
+          '\\Select']),
       definitions.REGISTRY_FILE_TYPE_USRCLASS: frozenset([
-          u'\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion']),
+          '\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion']),
   }
 
   def __init__(
       self, file_entry, collector_name, knowledge_base_object,
-      codepage=u'cp1252'):
+      codepage='cp1252'):
     """Initialize a Windows Registry helper.
 
     Args:
@@ -84,11 +86,11 @@ class PregRegistryHelper(object):
   @property
   def path(self):
     """str: path of the Windows Registry file."""
-    path_spec = getattr(self.file_entry, u'path_spec', None)
+    path_spec = getattr(self.file_entry, 'path_spec', None)
     if not path_spec:
-      return u'N/A'
+      return 'N/A'
 
-    return getattr(path_spec, u'location', u'N/A')
+    return getattr(path_spec, 'location', 'N/A')
 
   @property
   def root_key(self):
@@ -113,23 +115,23 @@ class PregRegistryHelper(object):
     Returns:
       dfwinreg.WinRegistryKey: key or None if not available.
     """
-    if key_path == u'.':
+    if key_path == '.':
       return self._currently_registry_key
 
     path_segments = []
 
     # If the key path is relative to the root key add the key path prefix.
-    if not key_path or key_path.startswith(u'\\'):
+    if not key_path or key_path.startswith('\\'):
       path_segments.append(self._key_path_prefix)
 
       # If no key path was provided then change to the root key.
       if not key_path:
-        path_segments.append(u'\\')
+        path_segments.append('\\')
 
     else:
       key_path_upper = key_path.upper()
-      if not key_path_upper.startswith(u'HKEY_'):
-        current_path = getattr(self._currently_registry_key, u'path', None)
+      if not key_path_upper.startswith('HKEY_'):
+        current_path = getattr(self._currently_registry_key, 'path', None)
         if current_path:
           path_segments.append(current_path)
 
@@ -137,7 +139,7 @@ class PregRegistryHelper(object):
 
     # Split all the path segments based on the path (segment) separator.
     path_segments = [
-        segment.split(u'\\') for segment in path_segments]
+        segment.split('\\') for segment in path_segments]
 
     # Flatten the sublists into one list.
     path_segments = [
@@ -146,12 +148,12 @@ class PregRegistryHelper(object):
     # Remove empty and current ('.') path segments.
     path_segments = [
         segment for segment in path_segments
-        if segment not in [None, u'', u'.']]
+        if segment not in [None, '', '.']]
 
     # Remove parent ('..') path segments.
     index = 0
     while index < len(path_segments):
-      if path_segments[index] == u'..':
+      if path_segments[index] == '..':
         path_segments.pop(index)
         index -= 1
 
@@ -161,7 +163,7 @@ class PregRegistryHelper(object):
 
       index += 1
 
-    key_path = u'\\'.join(path_segments)
+    key_path = '\\'.join(path_segments)
     return self.GetKeyByPath(key_path)
 
   def Close(self):
@@ -182,7 +184,7 @@ class PregRegistryHelper(object):
     Returns:
       str: current key path.
     """
-    return getattr(self._currently_registry_key, u'path', None)
+    return getattr(self._currently_registry_key, 'path', None)
 
   def GetKeyByPath(self, key_path):
     """Retrieves a specific key defined by the Registry key path.
@@ -234,14 +236,14 @@ class PregRegistryHelper(object):
       IOError: if the Windows Registry file cannot be opened.
     """
     if self._registry_file:
-      raise IOError(u'Registry file already open.')
+      raise IOError('Registry file already open.')
 
     file_object = self.file_entry.GetFileObject()
     if not file_object:
       logging.error(
-          u'Unable to open Registry file: {0:s} [{1:s}]'.format(
+          'Unable to open Registry file: {0:s} [{1:s}]'.format(
               self.path, self._collector_name))
-      raise IOError(u'Unable to open Registry file.')
+      raise IOError('Unable to open Registry file.')
 
     win_registry_reader = winreg.FileObjectWinRegistryFileReader()
     self._registry_file = win_registry_reader.Open(file_object)
@@ -249,9 +251,9 @@ class PregRegistryHelper(object):
       file_object.close()
 
       logging.error(
-          u'Unable to open Registry file: {0:s} [{1:s}]'.format(
+          'Unable to open Registry file: {0:s} [{1:s}]'.format(
               self.path, self._collector_name))
-      raise IOError(u'Unable to open Registry file.')
+      raise IOError('Unable to open Registry file.')
 
     self._win_registry = dfwinreg_registry.WinRegistry()
     self._key_path_prefix = self._win_registry.GetRegistryFileMapping(

@@ -2,6 +2,8 @@
 """Preg plaso front-end."""
 
 from __future__ import print_function
+from __future__ import unicode_literals
+
 import logging
 
 from dfvfs.helpers import file_system_searcher
@@ -71,7 +73,7 @@ class PregFrontend(object):
 
     for environment_variable in environment_variables:
       name = environment_variable.name.lower()
-      if name != u'systemroot':
+      if name != 'systemroot':
         continue
 
       path_resolver.SetEnvironmentVariable(
@@ -100,18 +102,18 @@ class PregFrontend(object):
         file_entry = path_spec_resolver.Resolver.OpenFileEntry(source_path_spec)
         if file_entry.IsFile():
           yield helper.PregRegistryHelper(
-              file_entry, u'OS', self.knowledge_base_object, codepage=codepage)
+              file_entry, 'OS', self.knowledge_base_object, codepage=codepage)
           continue
 
         # TODO: Change this into an actual mount point path spec.
         self._mount_path_spec = source_path_spec
 
       collector_name = source_path_spec.type_indicator
-      parent_path_spec = getattr(source_path_spec, u'parent', None)
+      parent_path_spec = getattr(source_path_spec, 'parent', None)
       if parent_path_spec and parent_path_spec.type_indicator == (
           dfvfs_definitions.TYPE_INDICATOR_VSHADOW):
-        vss_store = getattr(parent_path_spec, u'store_index', 0)
-        collector_name = u'VSS Store: {0:d}'.format(vss_store)
+        vss_store = getattr(parent_path_spec, 'store_index', 0)
+        collector_name = 'VSS Store: {0:d}'.format(vss_store)
 
       file_system, mount_point = self._GetSourceFileSystem(source_path_spec)
 
@@ -119,25 +121,25 @@ class PregFrontend(object):
         path_resolver = self._CreateWindowsPathResolver(
             file_system, mount_point, environment_variables)
 
-        if path.startswith(u'%UserProfile%\\'):
+        if path.startswith('%UserProfile%\\'):
           searcher = file_system_searcher.FileSystemSearcher(
               file_system, mount_point)
 
           user_profiles = []
           # TODO: determine the users path properly instead of relying on
           # common defaults. Note that these paths are language dependent.
-          for user_path in (u'/Documents and Settings/.+', u'/Users/.+'):
+          for user_path in ('/Documents and Settings/.+', '/Users/.+'):
             find_spec = file_system_searcher.FindSpec(
                 location_regex=user_path, case_sensitive=False)
             for path_spec in searcher.Find(find_specs=[find_spec]):
-              location = getattr(path_spec, u'location', None)
+              location = getattr(path_spec, 'location', None)
               if location:
-                if location.startswith(u'/'):
-                  location = u'\\'.join(location.split(u'/'))
+                if location.startswith('/'):
+                  location = '\\'.join(location.split('/'))
                 user_profiles.append(location)
 
           for user_profile in user_profiles:
-            path_resolver.SetEnvironmentVariable(u'UserProfile', user_profile)
+            path_resolver.SetEnvironmentVariable('UserProfile', user_profile)
 
             path_spec = path_resolver.ResolvePath(path)
             if not path_spec:
@@ -193,7 +195,7 @@ class PregFrontend(object):
       RuntimeError: if source path specification is not set.
     """
     if not source_path_spec:
-      raise RuntimeError(u'Missing source.')
+      raise RuntimeError('Missing source.')
 
     file_system = path_spec_resolver.Resolver.OpenFileSystem(
         source_path_spec, resolver_context=resolver_context)
@@ -213,9 +215,9 @@ class PregFrontend(object):
       keys (list[str]): Windows Registry key paths.
     """
     for key in keys:
-      if key.startswith(u'\\Software') and u'Wow6432Node' not in key:
-        _, first, second = key.partition(u'\\Software')
-        keys.append(u'{0:s}\\Wow6432Node{1:s}'.format(first, second))
+      if key.startswith('\\Software') and 'Wow6432Node' not in key:
+        _, first, second = key.partition('\\Software')
+        keys.append('{0:s}\\Wow6432Node{1:s}'.format(first, second))
 
   def GetRegistryFilePaths(self, registry_file_types):
     """Retrieves Windows Registry file paths.
@@ -232,52 +234,52 @@ class PregFrontend(object):
     """
     if self._parse_restore_points:
       restore_path = (
-          u'\\System Volume Information\\_restore.+\\RP[0-9]+\\snapshot\\')
+          '\\System Volume Information\\_restore.+\\RP[0-9]+\\snapshot\\')
     else:
-      restore_path = u''
+      restore_path = ''
 
     paths = []
     for registry_file_type in registry_file_types:
       if registry_file_type == definitions.REGISTRY_FILE_TYPE_NTUSER:
-        paths.append(u'%UserProfile%\\NTUSER.DAT')
+        paths.append('%UserProfile%\\NTUSER.DAT')
         if restore_path:
-          paths.append(u'{0:s}\\_REGISTRY_USER_NTUSER_.+'.format(restore_path))
+          paths.append('{0:s}\\_REGISTRY_USER_NTUSER_.+'.format(restore_path))
 
       elif registry_file_type == definitions.REGISTRY_FILE_TYPE_SAM:
-        paths.append(u'%SystemRoot%\\System32\\config\\SAM')
+        paths.append('%SystemRoot%\\System32\\config\\SAM')
         if restore_path:
-          paths.append(u'{0:s}\\_REGISTRY_MACHINE_SAM'.format(restore_path))
+          paths.append('{0:s}\\_REGISTRY_MACHINE_SAM'.format(restore_path))
 
       elif registry_file_type == definitions.REGISTRY_FILE_TYPE_SECURITY:
-        paths.append(u'%SystemRoot%\\System32\\config\\SECURITY')
+        paths.append('%SystemRoot%\\System32\\config\\SECURITY')
         if restore_path:
           paths.append(
-              u'{0:s}\\_REGISTRY_MACHINE_SECURITY'.format(restore_path))
+              '{0:s}\\_REGISTRY_MACHINE_SECURITY'.format(restore_path))
 
       elif registry_file_type == definitions.REGISTRY_FILE_TYPE_SOFTWARE:
-        paths.append(u'%SystemRoot%\\System32\\config\\SOFTWARE')
+        paths.append('%SystemRoot%\\System32\\config\\SOFTWARE')
         if restore_path:
           paths.append(
-              u'{0:s}\\_REGISTRY_MACHINE_SOFTWARE'.format(restore_path))
+              '{0:s}\\_REGISTRY_MACHINE_SOFTWARE'.format(restore_path))
 
       elif registry_file_type == definitions.REGISTRY_FILE_TYPE_SYSTEM:
-        paths.append(u'%SystemRoot%\\System32\\config\\SYSTEM')
+        paths.append('%SystemRoot%\\System32\\config\\SYSTEM')
         if restore_path:
-          paths.append(u'{0:s}\\_REGISTRY_MACHINE_SYSTEM'.format(restore_path))
+          paths.append('{0:s}\\_REGISTRY_MACHINE_SYSTEM'.format(restore_path))
 
       elif registry_file_type == definitions.REGISTRY_FILE_TYPE_USRCLASS:
         paths.append(
-            u'%UserProfile%\\AppData\\Local\\Microsoft\\Windows\\UsrClass.dat')
+            '%UserProfile%\\AppData\\Local\\Microsoft\\Windows\\UsrClass.dat')
         if restore_path:
           paths.append(
-              u'{0:s}\\_REGISTRY_USER_USRCLASS_.+'.format(restore_path))
+              '{0:s}\\_REGISTRY_USER_USRCLASS_.+'.format(restore_path))
 
     return paths
 
   # TODO: refactor this function. Current implementation is too complex.
   def GetRegistryHelpers(
       self, artifacts_registry, registry_file_types=None, plugin_names=None,
-      codepage=u'cp1252'):
+      codepage='cp1252'):
     """Retrieves discovered Windows Registry helpers.
 
     Args:
@@ -298,7 +300,7 @@ class PregFrontend(object):
     """
     if registry_file_types is None and plugin_names is None:
       raise ValueError(
-          u'Missing registry_file_types or plugin_name value.')
+          'Missing registry_file_types or plugin_name value.')
 
     if plugin_names is None:
       plugin_names = []
@@ -394,7 +396,7 @@ class PregFrontend(object):
       PluginList: Windows Registry plugins list.
     """
     winreg_parser = parsers_manager.ParsersManager.GetParserObjectByName(
-        u'winreg')
+        'winreg')
     if not winreg_parser:
       return
 
@@ -439,7 +441,7 @@ class PregFrontend(object):
     try:
       registry_helper.Open()
     except IOError as exception:
-      logging.error(u'Unable to parse Registry file, with error: {0:s}'.format(
+      logging.error('Unable to parse Registry file, with error: {0:s}'.format(
           exception))
       return {}
 
@@ -449,14 +451,14 @@ class PregFrontend(object):
 
     for key_path in key_paths:
       registry_key = registry_helper.GetKeyByPath(key_path)
-      return_dict[key_path] = {u'key': registry_key}
+      return_dict[key_path] = {'key': registry_key}
 
       if not registry_key:
         continue
 
-      return_dict[key_path][u'subkeys'] = list(registry_key.GetSubkeys())
+      return_dict[key_path]['subkeys'] = list(registry_key.GetSubkeys())
 
-      return_dict[key_path][u'data'] = self.ParseRegistryKey(
+      return_dict[key_path]['data'] = self.ParseRegistryKey(
           registry_key, registry_helper, use_plugins=use_plugins)
 
     return return_dict
@@ -532,12 +534,12 @@ class PregFrontend(object):
 
     if not found_matching_plugin:
       winreg_parser = parsers_manager.ParsersManager.GetParserObjectByName(
-          u'winreg')
+          'winreg')
       if not winreg_parser:
         return
 
       default_plugin_object = winreg_parser.GetPluginObjectByName(
-          u'winreg_default')
+          'winreg_default')
 
       default_plugin_object.Process(parser_mediator, registry_key)
 
