@@ -164,7 +164,7 @@ l2tpreg_description = (
 
 l2tpreg_long_description = (
     'log2timeline preg is an interactive Windows Registry analysis tool that '
-    'utilizes l2tpreg Windows Registry parser plugins, dfwinreg Windows '
+    'utilizes plaso Windows Registry parser plugins, dfwinreg Windows '
     'Registry and dfvfs storage media image capabilities.')
 
 setup(
