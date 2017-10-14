@@ -3,6 +3,9 @@
 """Installation and deployment script."""
 
 from __future__ import print_function
+import glob
+import locale
+import os
 import sys
 
 try:
@@ -20,15 +23,33 @@ try:
 except ImportError:
   bdist_rpm = None
 
-if sys.version < '2.7':
-  print('Unsupported Python version: {0:s}.'.format(sys.version))
-  print('Supported Python versions are 2.7 or a later 2.x version.')
-  sys.exit(1)
+try:
+  from setuptools.commands.sdist import sdist
+except ImportError:
+  from distutils.command.sdist import sdist
 
-# Change PYTHONPATH to include l2tpreg so that we can get the version.
+# Change PYTHONPATH to include l2tpreg.
 sys.path.insert(0, '.')
 
 import l2tpreg  # pylint: disable=wrong-import-position
+
+
+version_tuple = (sys.version_info[0], sys.version_info[1])
+if version_tuple[0] not in (2, 3):
+  print('Unsupported Python version: {0:s}.'.format(sys.version))
+  sys.exit(1)
+
+elif version_tuple[0] == 2 and version_tuple < (2, 7):
+  print((
+      'Unsupported Python 2 version: {0:s}, version 2.7 or higher '
+      'required.').format(sys.version))
+  sys.exit(1)
+
+elif version_tuple[0] == 3 and version_tuple < (3, 4):
+  print((
+      'Unsupported Python 3 version: {0:s}, version 3.4 or higher '
+      'required.').format(sys.version))
+  sys.exit(1)
 
 
 if not bdist_msi:
@@ -94,12 +115,21 @@ else:
               '%files',
               '%defattr(644,root,root,755)',
               '%doc ACKNOWLEDGEMENTS AUTHORS LICENSE README',
+              '%{_prefix}/bin/*.py',
               '%{_prefix}/lib/python*/site-packages/l2tpreg/*.py',
+              '%{_prefix}/lib/python*/site-packages/l2tpreg/*/*.py',
+              '%{_prefix}/lib/python*/site-packages/l2tpreg/*/*/*.py',
               '%{_prefix}/lib/python*/site-packages/l2tpreg*.egg-info/*',
+              '%{_prefix}/share/l2tpreg/*',
               '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*.pyc',
               '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*.pyo',
-              ('%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/'
-               '__pycache__/*')]
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/__pycache__/*',
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*.pyc',
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*.pyo',
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/__pycache__/*',
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*/*.pyc',
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*/*.pyo',
+              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*/__pycache__/*']
 
           python_spec_file.extend(lines)
           break
@@ -127,12 +157,26 @@ else:
       return python_spec_file
 
 
+if version_tuple[0] == 2:
+  encoding = sys.stdin.encoding
+
+  # Note that sys.stdin.encoding can be None.
+  if not encoding:
+    encoding = locale.getpreferredencoding()
+
+  # Make sure the default encoding is set correctly otherwise
+  # setup.py sdist will fail to include filenames with Unicode characters.
+  reload(sys)
+
+  sys.setdefaultencoding(encoding)
+
+
 l2tpreg_description = (
     'Interactive Windows Registry analysis tool.')
 
 l2tpreg_long_description = (
     'log2timeline preg is an interactive Windows Registry analysis tool that '
-    'utilizes plaso Windows Registry parser plugins, dfwinreg Windows '
+    'utilizes l2tpreg Windows Registry parser plugins, dfwinreg Windows '
     'Registry and dfvfs storage media image capabilities.')
 
 setup(
@@ -142,11 +186,12 @@ setup(
     long_description=l2tpreg_long_description,
     license='Apache License, Version 2.0',
     url='https://github.com/log2timeline/l2tpreg',
-    maintainer='dfDateTime development team',
-    maintainer_email='log2timeline-dev@googlegroups.com',
+    maintainer='Log2Timeline maintainers',
+    maintainer_email='log2timeline-maintainers@googlegroups.com',
     cmdclass={
         'bdist_msi': BdistMSICommand,
-        'bdist_rpm': BdistRPMCommand},
+        'bdist_rpm': BdistRPMCommand,
+        'sdist_test_data': sdist},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -156,11 +201,11 @@ setup(
     packages=find_packages('.', exclude=[
         'scripts', 'tests', 'tests.*', 'utils']),
     package_dir={
-        'l2tpreg': 'l2tpreg'
+        'l2tpreg': 'l2tpreg',
     },
     scripts=[os.path.join('scripts', 'preg.py')],
     data_files=[
         ('share/doc/l2tpreg', [
-            'ACKNOWLEDGEMENTS', 'AUTHORS', 'LICENSE', 'README']),
+            'AUTHORS', 'ACKNOWLEDGEMENTS', 'LICENSE', 'README']),
     ],
 )
