@@ -116,20 +116,8 @@ else:
               '%defattr(644,root,root,755)',
               '%doc ACKNOWLEDGEMENTS AUTHORS LICENSE README',
               '%{_prefix}/bin/*.py',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg/*.py',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg/*/*.py',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg/*/*/*.py',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg*.egg-info/*',
-              '%{_prefix}/share/l2tpreg/*',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*.pyc',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*.pyo',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/__pycache__/*',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*.pyc',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*.pyo',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/__pycache__/*',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*/*.pyc',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*/*.pyo',
-              '%exclude %{_prefix}/lib/python*/site-packages/l2tpreg/*/*/__pycache__/*']
+              '%{_prefix}/lib/python*/site-packages/l2tpreg/',
+              '%{_prefix}/lib/python*/site-packages/l2tpreg*.egg-info/*']
 
           python_spec_file.extend(lines)
           break
