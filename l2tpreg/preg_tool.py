@@ -32,7 +32,7 @@ from plaso.parsers import mediator as parsers_mediator
 from plaso.parsers import winreg_plugins  # pylint: disable=unused-import
 from plaso.preprocessors import manager as preprocess_manager
 # TODO: refactor usage of fake storage.
-from plaso.storage import fake_storage
+from plaso.storage.fake import writer as fake_storage_writer
 
 from l2tpreg import definitions
 from l2tpreg import helper
@@ -1247,7 +1247,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     # TODO: refactor usage of fake storage.
     session = sessions.Session()
-    storage_writer = fake_storage.FakeStorageWriter(session)
+    storage_writer = fake_storage_writer.FakeStorageWriter(session)
     storage_writer.Open()
 
     parser_mediator = parsers_mediator.ParserMediator(
