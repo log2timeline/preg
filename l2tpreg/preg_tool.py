@@ -144,8 +144,9 @@ class PregTool(storage_media_tool.StorageMediaTool):
     self.run_mode = None
     self.source_type = None
 
+  @property
   def artifacts_registry(self):
-    """artifacts.ArtifactDefinitionsRegistry]: artifact definitions registry."""
+    """artifacts.ArtifactDefinitionsRegistry: artifact definitions registry."""
     return self._artifacts_registry
 
   def _CreateWindowsPathResolver(
