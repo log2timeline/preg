@@ -18,6 +18,7 @@ from dfvfs.path import factory as path_spec_factory
 from dfvfs.resolver import resolver as path_spec_resolver
 from dfvfs.volume import tsk_volume_system
 
+from plaso.lib import loggers
 from plaso.cli import storage_media_tool
 from plaso.cli import views as cli_views
 from plaso.cli.helpers import manager as helpers_manager
@@ -1012,7 +1013,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     Returns:
       bool: True if the arguments were successfully parsed.
     """
-    self._ConfigureLogging()
+    loggers.ConfigureLogging()
 
     argument_parser = argparse.ArgumentParser(
         description=self.DESCRIPTION, epilog=self.EPILOG, add_help=False,
