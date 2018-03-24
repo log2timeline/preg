@@ -1196,7 +1196,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     self.registry_file = registry_file
 
-    scan_context = self.ScanSource()
+    scan_context = self.ScanSource(self._source_path)
     self.source_type = scan_context.source_type
 
   def PrintHeader(self, text, character='*'):
