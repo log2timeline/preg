@@ -3,6 +3,7 @@ IPython >= 1.2.1
 PyYAML >= 3.10
 XlsxWriter >= 0.9.3
 artifacts >= 20170818
+backports.lzma ; python_version < '3.0'
 bencode.py
 binplist >= 0.1.4
 certifi >= 2016.9.26
@@ -12,6 +13,7 @@ dfdatetime >= 20170529
 dfvfs >= 20160803
 dfwinreg >= 20170521
 dpkt >= 1.8
+dtfabric >= 20170524
 efilter == 1-1.5
 future >= 0.16.0
 hachoir-core >= 1.3.3 ; python_version < '3.0'
@@ -44,7 +46,6 @@ pefile >= 2017.5.26
 plaso >= 20180127
 psutil >= 1.2.1
 pycrypto >= 2.6.0
-pyliblzma >= 0.5.3 ; python_version < '3.0'
 pyparsing >= 2.0.3
 python-dateutil >= 1.5
 pytsk3 >= 20160721
