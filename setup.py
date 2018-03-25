@@ -3,7 +3,6 @@
 """Installation and deployment script."""
 
 from __future__ import print_function
-import glob
 import locale
 import os
 import sys
@@ -146,7 +145,7 @@ else:
 
 
 if version_tuple[0] == 2:
-  encoding = sys.stdin.encoding
+  encoding = sys.stdin.encoding  # pylint: disable=invalid-name
 
   # Note that sys.stdin.encoding can be None.
   if not encoding:
@@ -154,9 +153,9 @@ if version_tuple[0] == 2:
 
   # Make sure the default encoding is set correctly otherwise
   # setup.py sdist will fail to include filenames with Unicode characters.
-  reload(sys)
+  reload(sys)  # pylint: disable=undefined-variable
 
-  sys.setdefaultencoding(encoding)
+  sys.setdefaultencoding(encoding)  # pylint: disable=no-member
 
 
 l2tpreg_description = (
