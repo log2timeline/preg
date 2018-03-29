@@ -12,7 +12,7 @@ if test "${TARGET}" = "pylint";
 then
 	pylint --version
 
-	for FILE in `find setup.py l2tpreg tests -name \*.py`;
+	for FILE in `find setup.py config l2tpreg scripts tests -name \*.py`;
 	do
 		echo "Checking: ${FILE}";
 
