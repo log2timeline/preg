@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Installation and deployment script."""
 
@@ -111,12 +111,17 @@ else:
         elif line.startswith('%files'):
           # Cannot use %{_libdir} here since it can expand to "lib64".
           lines = [
-              '%files',
+              '%files -n {0:s}-%{{name}}'.format(python_package),
               '%defattr(644,root,root,755)',
               '%doc ACKNOWLEDGEMENTS AUTHORS LICENSE README',
               '%{_prefix}/bin/*.py',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg/',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg*.egg-info/*']
+              '%{_prefix}/lib/python*/site-packages/**/',
+              '%{_prefix}/lib/python*/site-packages/l2tpreg*.egg-info/*',
+              '',
+              '%exclude %{_prefix}/share/doc/*',
+              '%exclude %{_prefix}/lib/python*/site-packages/**/*.pyc',
+              '%exclude %{_prefix}/lib/python*/site-packages/**/*.pyo',
+              '%exclude %{_prefix}/lib/python*/site-packages/**/__pycache__/*']
 
           python_spec_file.extend(lines)
           break
@@ -163,8 +168,8 @@ l2tpreg_description = (
 
 l2tpreg_long_description = (
     'log2timeline preg is an interactive Windows Registry analysis tool that '
-    'utilizes plaso Windows Registry parser plugins, dfwinreg Windows '
-    'Registry and dfvfs storage media image capabilities.')
+    'utilizes plaso for its Windows Registry parser plugins, dfWinReg for its '
+    'Windows Registry and dfVFS for its storage media image capabilities.')
 
 setup(
     name='l2tpreg',

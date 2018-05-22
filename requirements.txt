@@ -5,16 +5,17 @@ XlsxWriter >= 0.9.3
 artifacts >= 20170818
 backports.lzma ; python_version < '3.0'
 bencode.py
-binplist >= 0.1.4
+biplist >= 1.0.3
 certifi >= 2016.9.26
 chardet >= 2.0.1
 construct >= 2.5.2,<= 2.5.3
-dfdatetime >= 20170529
-dfvfs >= 20160803
+dfdatetime >= 20180509
+dfvfs >= 20180326
 dfwinreg >= 20170521
 dpkt >= 1.8
-dtfabric >= 20170524
+dtfabric >= 20180522
 efilter == 1-1.5
+elasticsearch >= 5.4.0,<= 5.5.1
 future >= 0.16.0
 hachoir-core >= 1.3.3 ; python_version < '3.0'
 hachoir-metadata >= 1.3.3 ; python_version < '3.0'
@@ -27,7 +28,7 @@ libevtx-python >= 20141112
 libewf-python >= 20131210
 libfsntfs-python >= 20151130
 libfvde-python >= 20160719
-libfwnt-python >= 20160418
+libfwnt-python >= 20180117
 libfwsi-python >= 20150606
 liblnk-python >= 20150830
 libmsiecf-python >= 20150314
@@ -44,8 +45,8 @@ libvshadow-python >= 20160109
 libvslvm-python >= 20160109
 pefile >= 2017.5.26
 plaso >= 20180127
-psutil >= 1.2.1
-pycrypto >= 2.6.0
+psutil >= 5.4.3
+pycrypto >= 2.6
 pyparsing >= 2.0.3
 python-dateutil >= 1.5
 pytsk3 >= 20160721
