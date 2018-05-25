@@ -319,7 +319,8 @@ class PregTool(storage_media_tool.StorageMediaTool):
     return paths
 
   # TODO: refactor this function. Current implementation is too complex.
-  def _GetRegistryHelpers(
+  # TODO: make method protected.
+  def GetRegistryHelpers(
       self, artifacts_registry, registry_file_types=None, plugin_names=None,
       codepage='cp1252'):
     """Retrieves discovered Windows Registry helpers.
@@ -1338,7 +1339,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     file, find all Registry keys they are able to parse and run through
     them, one by one.
     """
-    registry_helpers = self._GetRegistryHelpers(
+    registry_helpers = self.GetRegistryHelpers(
         self._artifacts_registry, registry_file_types=[self.registry_file])
 
     for registry_helper in registry_helpers:
@@ -1373,7 +1374,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     configuration object for every detected hive file and parses it using
     all available plugins.
     """
-    registry_helpers = self._GetRegistryHelpers(
+    registry_helpers = self.GetRegistryHelpers(
         self._artifacts_registry, plugin_names=self.plugin_names,
         registry_file_types=[self.registry_file])
 
@@ -1391,7 +1392,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     """Runs against a set of Registry plugins."""
     # TODO: Add support for splitting the output to separate files based on
     # each plugin name.
-    registry_helpers = self._GetRegistryHelpers(
+    registry_helpers = self.GetRegistryHelpers(
         self._artifacts_registry, plugin_names=self.plugin_names)
 
     plugins = []
