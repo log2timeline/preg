@@ -625,15 +625,14 @@ class PregConsole(object):
           index, star, registry_helper.path, collector_name))
 
   def SetPrompt(
-      self, registry_file_path=None, config=None, prepend_string=None):
+      self, registry_file_path=None, configuration=None, prepend_string=None):
     """Sets the prompt string on the console.
 
     Args:
       registry_file_path (Optional[str]): name or path of the Windows Registry
           file.
-      config (Optional[IPython.terminal.embed.InteractiveShellEmbed]): iPython
-          configuration, where None will attempt to automatically derive
-          the configuration.
+      configuration (Optional[traitlets.Config]): iPython configuration, where
+          None will attempt to automatically derive the configuration.
       prepend_string (Optional[str]): text to prepend in the command prompt.
     """
     if registry_file_path is None:
@@ -650,10 +649,10 @@ class PregConsole(object):
       prompt_strings.append('{0:s} '.format(prepend_string))
     prompt_strings.append(r'[{color.Red}\#{color.Normal}] \$ ')
 
-    if config is None:
+    if configuration is None:
       ipython_config = self.GetConfig()
     else:
-      ipython_config = config
+      ipython_config = configuration
 
     try:
       # PromptManager was replaced by prompts_class in IPython 5.0
