@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+uu#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Tests for the Python 2 and 3 compatible type definitions."""
 
@@ -15,7 +15,7 @@ else:
   from unittest.mock import MagicMock  # pylint: disable=import-error
   from importlib import reload  # pylint: disable=redefined-builtin
 
-from dfwinreg import py2to3
+from l2tpreg import py2to3
 
 from tests import test_lib as shared_test_lib
 
