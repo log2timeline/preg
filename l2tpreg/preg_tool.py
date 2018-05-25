@@ -1374,7 +1374,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     configuration object for every detected hive file and parses it using
     all available plugins.
     """
-    registry_helpers = self.etRegistryHelpers(
+    registry_helpers = self.GetRegistryHelpers(
         self._artifacts_registry, plugin_names=self.plugin_names,
         registry_file_types=[self.registry_file])
 
