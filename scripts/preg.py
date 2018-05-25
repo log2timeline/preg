@@ -34,7 +34,6 @@ from IPython.core import magic
 from plaso.cli import tools as cli_tools
 from plaso.cli import views as cli_views
 from plaso.lib import errors
-from plaso.lib import timelib
 
 from l2tpreg import helper
 from l2tpreg import hexdump

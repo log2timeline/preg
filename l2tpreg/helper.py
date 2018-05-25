@@ -10,6 +10,7 @@ from dfwinreg import registry as dfwinreg_registry
 from plaso.parsers import winreg
 
 from l2tpreg import definitions
+from l2tpreg import hexdump
 
 
 class PregRegistryHelper(object):
