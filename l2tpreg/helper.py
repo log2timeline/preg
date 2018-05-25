@@ -272,6 +272,7 @@ class PregRegistryHelper(object):
             '', '[' + value.data_type_string, value.name, value_string)
         entries.append(entry_string)
 
+    entries.append('')
     return '\n'.join(entries)
 
   def Open(self):
