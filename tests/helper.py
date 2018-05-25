@@ -26,6 +26,7 @@ class PregRegistryHelperTest(test_lib.BaseTestCase):
   # TODO: add tests for GetCurrentRegistryPath.
   # TODO: add tests for GetKeyByPath.
   # TODO: add tests for GetRegistryFileType.
+  # TODO: add tests for ListCurrentKey.
   # TODO: add tests for Open and Close.
 
 

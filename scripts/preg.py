@@ -202,7 +202,7 @@ class PregMagics(magic.Magics):
 
   @magic.line_magic('ls')
   def ListDirectoryContent(self, line):
-    """List all subkeys and values of the current key.
+    """Outputs a list of the subkeys and values of the current key.
 
     Args:
       line (str): command line provide via the console.
@@ -217,53 +217,11 @@ class PregMagics(magic.Magics):
     else:
       verbose = False
 
-    sub = []
-    current_file = self.console.current_helper
-    if not current_file:
+    if not self.console.current_helper:
       return
 
-    current_key = current_file.GetCurrentRegistryKey()
-    for key in current_key.GetSubkeys():
-      # TODO: move this construction into a separate function in OutputWriter.
-      time_string = timelib.Timestamp.CopyToIsoFormat(
-          key.last_written_time)
-      time_string, _, _ = time_string.partition('.')
-
-      sub.append(('{0:>19s} {1:>15s}  {2:s}'.format(
-          time_string.replace('T', ' '), '[KEY]',
-          key.name), True))
-
-    for value in current_key.GetValues():
-      if not verbose:
-        sub.append(('{0:>19s} {1:>14s}]  {2:s}'.format(
-            '', '[' + value.data_type_string, value.name), False))
-      else:
-        if value.DataIsString():
-          value_string = value.GetDataAsObject()
-
-        elif value.DataIsInteger():
-          value_string = '{0:d}'.format(value.GetDataAsObject())
-
-        elif value.DataIsMultiString():
-          value_string = '{0:s}'.format(''.join(value.GetDataAsObject()))
-
-        elif value.DataIsBinaryData():
-          value_string = hexdump.Hexdump.FormatData(
-              value.data, maximum_data_size=16)
-
-        else:
-          value_string = ''
-
-        sub.append((
-            '{0:>19s} {1:>14s}]  {2:<25s}  {3:s}'.format(
-                '', '[' + value.data_type_string, value.name, value_string),
-            False))
-
-    for entry, subkey in sorted(sub):
-      if subkey:
-        self.output_writer.Write('dr-xr-xr-x {0:s}\n'.format(entry))
-      else:
-        self.output_writer.Write('-r-xr-xr-x {0:s}\n'.format(entry))
+    output = self.console.current_helper.ListCurrentKey(verbose=verbose)
+    self.output_writer.Write(output)
 
   @magic.line_magic('parse')
   def ParseCurrentKey(self, line):

@@ -144,7 +144,7 @@ class PregRegistryHelper(object):
     # Remove empty and current ('.') path segments.
     path_segments = [
         segment for segment in path_segments
-        if segment not in [None, '', '.']]
+        if segment not in (None, '', '.')]
 
     # Remove parent ('..') path segments.
     index = 0
@@ -224,6 +224,54 @@ class PregRegistryHelper(object):
         break
 
     return registry_file_type
+
+  def ListCurrentKey(self, verbose=False):
+    """List the subkeys and values of the current key.
+
+    Args:
+      verbose (Optional[bool]): True if the listing should be vebose.
+
+    Returns:
+      str: list of the subkeys and values of the current key.
+    """
+    entries = []
+
+    current_key = self.GetCurrentRegistryKey()
+    for key in current_key.GetSubkeys():
+      date_time_string = key.last_written_time.CopyToDateTimeString()
+
+      entry_string = 'dr-xr-xr-x {0:>19s} {1:>15s}  {2:s}'.format(
+          date_time_string, '[KEY]', key.name)
+      entries.append(entry_string)
+
+    for value in current_key.GetValues():
+      if not verbose:
+        entry_string = '-r-xr-xr-x {0:>19s} {1:>14s}]  {2:s}'.format(
+            '', '[' + value.data_type_string, value.name)
+        entries.append(entry_string)
+
+      else:
+        if value.DataIsString():
+          value_string = value.GetDataAsObject()
+
+        elif value.DataIsInteger():
+          value_string = '{0:d}'.format(value.GetDataAsObject())
+
+        elif value.DataIsMultiString():
+          value_string = '{0:s}'.format(''.join(value.GetDataAsObject()))
+
+        elif value.DataIsBinaryData():
+          value_string = hexdump.Hexdump.FormatData(
+              value.data, maximum_data_size=16)
+
+        else:
+          value_string = ''
+
+        entry_string = '-r-xr-xr-x {0:>19s} {1:>14s}]  {2:<25s}  {3:s}'.format(
+            '', '[' + value.data_type_string, value.name, value_string)
+        entries.append(entry_string)
+
+    return '\n'.join(entries)
 
   def Open(self):
     """Opens a Windows Registry file.
