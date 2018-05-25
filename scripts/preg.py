@@ -706,7 +706,8 @@ class PregConsole(object):
     else:
       registry_file_path = 'NO HIVE LOADED'
 
-    self.SetPrompt(registry_file_path=registry_file_path, config=ipshell_config)
+    self.SetPrompt(
+        registry_file_path=registry_file_path, configuration=ipshell_config)
 
     # Starting the shell.
     ipshell = InteractiveShellEmbed(
