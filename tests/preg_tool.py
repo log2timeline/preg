@@ -151,7 +151,7 @@ class PregToolTest(test_lib.CLIToolTestCase):
   @test_lib.skipUnlessHasTestFile(['SYSTEM'])
   @test_lib.skipUnlessHasTestFile(['registry_test.dd'])
   def testGetRegistryHelpers(self):
-    """Tests the _GetRegistryHelpers function."""
+    """Tests the GetRegistryHelpers function."""
     path = self._GetTestFilePath(['artifacts'])
     artifact_registry = artifacts_registry.ArtifactDefinitionsRegistry()
     reader = artifacts_reader.YamlArtifactsReader()
@@ -159,9 +159,9 @@ class PregToolTest(test_lib.CLIToolTestCase):
 
     test_tool = self._ConfigureSingleFileTest()
     with self.assertRaises(ValueError):
-      test_tool._GetRegistryHelpers(artifact_registry)
+      test_tool.GetRegistryHelpers(artifact_registry)
 
-    registry_helpers = test_tool._GetRegistryHelpers(
+    registry_helpers = test_tool.GetRegistryHelpers(
         artifact_registry, registry_file_types=['SYSTEM'])
 
     self.assertEqual(len(registry_helpers), 1)
@@ -172,7 +172,7 @@ class PregToolTest(test_lib.CLIToolTestCase):
     self.assertEqual(registry_helper.path, file_path)
 
     test_tool = self._ConfigureStorageMediaFileTest()
-    registry_helpers = test_tool._GetRegistryHelpers(
+    registry_helpers = test_tool.GetRegistryHelpers(
         artifact_registry, registry_file_types=['NTUSER'])
 
     self.assertEqual(len(registry_helpers), 3)
@@ -185,11 +185,11 @@ class PregToolTest(test_lib.CLIToolTestCase):
     self.assertEqual(registry_helper.collector_name, 'TSK')
     registry_helper.Close()
 
-    registry_helpers = test_tool._GetRegistryHelpers(
+    registry_helpers = test_tool.GetRegistryHelpers(
         artifact_registry, plugin_names=['userassist'])
     self.assertEqual(len(registry_helpers), 3)
 
-    registry_helpers = test_tool._GetRegistryHelpers(
+    registry_helpers = test_tool.GetRegistryHelpers(
         artifact_registry, registry_file_types=['SAM'])
     self.assertEqual(len(registry_helpers), 1)
 
@@ -233,7 +233,7 @@ class PregToolTest(test_lib.CLIToolTestCase):
 
     test_tool = self._ConfigureSingleFileTest()
 
-    registry_helpers = test_tool._GetRegistryHelpers(
+    registry_helpers = test_tool.GetRegistryHelpers(
         artifact_registry, registry_file_types=['SYSTEM'])
     registry_helper = registry_helpers[0]
 
