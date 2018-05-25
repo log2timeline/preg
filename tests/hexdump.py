@@ -12,6 +12,8 @@ from tests import test_lib
 class HexdumpTests(test_lib.BaseTestCase):
   """Tests for the binary data in hexadecimal (hexdump) formatter."""
 
+  # pylint: disable=protected-access
+
   def testFormatDataInHexadecimal(self):
     """Tests the _FormatDataInHexadecimal function."""
     data = b'\x00\x01\x02\x03\x04\x05\x06'
