@@ -17,7 +17,7 @@ import IPython
 
 from dfvfs.lib import definitions as dfvfs_definitions
 
-# pylint: disable=import-error,no-name-in-module,ungrouped-imports
+# pylint: disable=import-error,no-name-in-module,ungrouped-imports,wrong-import-position
 try:
   # Support IPython 1.x
   from IPython.terminal.embed import InteractiveShellEmbed
