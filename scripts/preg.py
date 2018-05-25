@@ -19,12 +19,16 @@ from dfvfs.lib import definitions as dfvfs_definitions
 
 # pylint: disable=import-error,no-name-in-module,ungrouped-imports
 try:
-  # Support version 1.x of IPython.
+  # Support IPython 1.x
   from IPython.terminal.embed import InteractiveShellEmbed
 except ImportError:
   from IPython.frontend.terminal.embed import InteractiveShellEmbed
 
-from IPython.config.loader import Config
+if IPython.__version__ < '4.0.0':
+  from IPython.config import loader as config
+else:
+  from traitlets import config
+
 from IPython.core import magic
 
 from plaso.cli import tools as cli_tools
@@ -504,14 +508,14 @@ class PregConsole(object):
     """Retrieves the iPython configuration.
 
     Returns:
-      IPython.terminal.embed.InteractiveShellEmbed: iPython configuration.
+      traitlets.Config: iPython configuration.
     """
     try:
       # The "get_ipython" function does not exist except within an IPython
       # session.
       return get_ipython()  # pylint: disable=undefined-variable
     except NameError:
-      return Config()
+      return config.Config()
 
   def IsLoaded(self):
     """Checks if a Windows Registry file is loaded.
@@ -652,9 +656,13 @@ class PregConsole(object):
       ipython_config = config
 
     try:
-      ipython_config.PromptManager.in_template = r''.join(prompt_strings)
+      # PromptManager was replaced by prompts_class in IPython 5.0
+      ipython_config.prompts_class.in_template = r''.join(prompt_strings)
     except AttributeError:
-      ipython_config.prompt_manager.in_template = r''.join(prompt_strings)
+      try:
+        ipython_config.PromptManager.in_template = r''.join(prompt_strings)
+      except AttributeError:
+        ipython_config.prompt_manager.in_template = r''.join(prompt_strings)
 
   def Run(self):
     """Runs the interactive console."""
