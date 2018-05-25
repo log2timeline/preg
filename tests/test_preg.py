@@ -210,7 +210,7 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
         b'-r-xr-xr-x                            [REG_SZ]  LastUpdateBeginTime\n'
         b'-r-xr-xr-x                            [REG_SZ]  '
         b'LastUpdateFinishTime\n'
-        b'-r-xr-xr-x                            [REG_SZ]  VersionXmlURL\n']
+        b'-r-xr-xr-x                            [REG_SZ]  VersionXmlURL\n')
     output = self._output_writer.ReadOutput()
     self.assertEqual(output.split(b'\n'), expected_output.split(b'\n'))
 
