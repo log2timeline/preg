@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """Tests for the preg front-end."""
 
+from __future__ import unicode_literals
+
 import unittest
 
 from l2tpreg import helper
@@ -52,12 +54,12 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
 
   def setUp(self):
     """Sets up the needed objects used throughout the test."""
-    self._output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
+    self._output_writer = test_lib.TestOutputWriter(encoding='utf-8')
     self._test_tool = preg_tool.PregTool(output_writer=self._output_writer)
     self._test_console = preg.PregConsole(self._test_tool)
-    file_entry = self._GetTestFileEntry([u'NTUSER.DAT'])
-    self._file_path = self._GetTestFilePath([u'NTUSER.DAT'])
-    self._registry_helper = helper.PregRegistryHelper(file_entry, u'OS')
+    file_entry = self._GetTestFileEntry(['NTUSER.DAT'])
+    self._file_path = self._GetTestFilePath(['NTUSER.DAT'])
+    self._registry_helper = helper.PregRegistryHelper(file_entry, 'OS')
 
   def tearDown(self):
     """Tears down the needed ojects after a test."""
@@ -66,16 +68,16 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
   def testAddRegistryHelpers(self):
     """Test the add registry helper."""
     self._test_console.AddRegistryHelper(self._registry_helper)
-    registry_helpers = getattr(self._test_console, u'_registry_helpers', [])
+    registry_helpers = getattr(self._test_console, '_registry_helpers', [])
 
     self.assertEqual(len(registry_helpers), 1)
-    setattr(self._test_console, u'_registry_helpers', [])
+    setattr(self._test_console, '_registry_helpers', [])
 
   def testPrintBanner(self):
     """Test the PrintBanner function."""
-    output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
-    setattr(self._test_console, u'_output_writer', output_writer)
-    setattr(self._test_console.preg_tool, u'_output_writer', output_writer)
+    output_writer = test_lib.TestOutputWriter(encoding='utf-8')
+    setattr(self._test_console, '_output_writer', output_writer)
+    setattr(self._test_console.preg_tool, '_output_writer', output_writer)
 
     self.assertFalse(self._test_console.IsLoaded())
     self._test_console.AddRegistryHelper(self._registry_helper)
@@ -98,21 +100,21 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
 
   def testPrintRegistryFileList(self):
     """Test the PrintRegistryFileList function."""
-    output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
-    setattr(self._test_console, u'_output_writer', output_writer)
-    setattr(self._test_console.preg_tool, u'_output_writer', output_writer)
+    output_writer = test_lib.TestOutputWriter(encoding='utf-8')
+    setattr(self._test_console, '_output_writer', output_writer)
+    setattr(self._test_console.preg_tool, '_output_writer', output_writer)
 
     self._test_console.PrintRegistryFileList()
     text = output_writer.ReadOutput()
-    self.assertEqual(text, u'')
+    self.assertEqual(text, '')
 
     self._test_console.AddRegistryHelper(self._registry_helper)
     self._test_console.PrintRegistryFileList()
     text = output_writer.ReadOutput()
 
     expected_text = (
-        u'Index Hive [collector]\n'
-        u'0     {0:s} [OS]\n').format(self._file_path)
+        'Index Hive [collector]\n'
+        '0     {0:s} [OS]\n').format(self._file_path)
 
     self.assertEqual(text, expected_text)
 
@@ -123,7 +125,7 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
 
     # Open a Registry key using the magic class.
     registry_key_path = (
-        u'HKEY_CURRENT_USER\\Software\\JavaSoft\\Java Update\\Policy')
+        'HKEY_CURRENT_USER\\Software\\JavaSoft\\Java Update\\Policy')
     key = self._registry_helper.GetKeyByPath(registry_key_path)
     self.assertEqual(key.path, registry_key_path)
 
@@ -136,13 +138,13 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
     self.assertEqual(current_key.path, registry_key_path)
 
     # Get a value out of the currently loaded Registry key.
-    value = self._test_console._CommandGetValue(u'VersionXmlURL')
-    self.assertEqual(value.name, u'VersionXmlURL')
+    value = self._test_console._CommandGetValue('VersionXmlURL')
+    self.assertEqual(value.name, 'VersionXmlURL')
 
-    value_data = self._test_console._CommandGetValueData(u'VersionXmlURL')
+    value_data = self._test_console._CommandGetValueData('VersionXmlURL')
     self.assertEqual(
         value_data,
-        u'http://javadl.sun.com/webapps/download/AutoDL?BundleId=33742')
+        'http://javadl.sun.com/webapps/download/AutoDL?BundleId=33742')
 
 
 class PregMagicClassTest(test_lib.CLIToolTestCase):
@@ -152,7 +154,7 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
 
   def setUp(self):
     """Sets up the needed objects used throughout the test."""
-    self._output_writer = test_lib.TestOutputWriter(encoding=u'utf-8')
+    self._output_writer = test_lib.TestOutputWriter(encoding='utf-8')
     test_tool = preg_tool.PregTool(output_writer=self._output_writer)
 
     self._test_console = preg.PregConsole(test_tool)
@@ -160,9 +162,9 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
     self._magic_obj.console = self._test_console
     self._magic_obj.output_writer = self._output_writer
 
-    registry_file_entry = self._GetTestFileEntry([u'NTUSER.DAT'])
+    registry_file_entry = self._GetTestFileEntry(['NTUSER.DAT'])
     self._registry_helper = helper.PregRegistryHelper(
-        registry_file_entry, u'OS')
+        registry_file_entry, 'OS')
 
     self._test_console.AddRegistryHelper(self._registry_helper)
     self._test_console.LoadRegistryFile(0)
@@ -174,24 +176,24 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
 
   def testHiveActions(self):
     """Test the HiveAction function."""
-    self._magic_obj.HiveActions(u'list')
+    self._magic_obj.HiveActions('list')
     output = self._output_writer.ReadOutput()
 
-    registry_file_path = self._GetTestFilePath([u'NTUSER.DAT'])
+    registry_file_path = self._GetTestFilePath(['NTUSER.DAT'])
     # TODO: output is a binary string, correct the expected output.
     expected_output = (
-        u'Index Hive [collector]\n0     *{0:s} [OS]\n\n'
-        u'To open a Registry file, use: hive open INDEX\n').format(
+        'Index Hive [collector]\n0     *{0:s} [OS]\n\n'
+        'To open a Registry file, use: hive open INDEX\n').format(
             registry_file_path)
 
     self.assertEqual(output, expected_output)
 
   def testMagicClass(self):
     """Test the magic class functions."""
-    self.assertEqual(self._registry_helper.name, u'NTUSER.DAT')
+    self.assertEqual(self._registry_helper.name, 'NTUSER.DAT')
     # Change directory and verify it worked.
     registry_key_path = (
-        u'HKEY_CURRENT_USER\\Software\\JavaSoft\\Java Update\\Policy')
+        'HKEY_CURRENT_USER\\Software\\JavaSoft\\Java Update\\Policy')
     self._magic_obj.ChangeDirectory(registry_key_path)
 
     registry_key = self._test_console._CommandGetCurrentKey()
@@ -203,31 +205,32 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
     self.assertEqual(current_key.path, registry_key_path)
 
     # List the directory content.
-    self._magic_obj.ListDirectoryContent(u'')
+    self._magic_obj.ListDirectoryContent('')
     expected_output = (
         b'-r-xr-xr-x                            [REG_SZ]  LastUpdateBeginTime\n'
         b'-r-xr-xr-x                            [REG_SZ]  '
         b'LastUpdateFinishTime\n'
-        b'-r-xr-xr-x                            [REG_SZ]  VersionXmlURL\n')
+        b'-r-xr-xr-x                            [REG_SZ]  VersionXmlURL\n'
+        b'\n')
     output = self._output_writer.ReadOutput()
-    self.assertEqual(output, expected_output)
+    self.assertEqual(output.split(b'\n'), expected_output.split(b'\n'))
 
     # Parse the current key.
-    self._magic_obj.ParseCurrentKey(u'')
+    self._magic_obj.ParseCurrentKey('')
     partial_string = (
-        u'LastUpdateFinishTime : [REG_SZ] Tue, 04 Aug 2009 15:18:35 GMT')
+        'LastUpdateFinishTime : [REG_SZ] Tue, 04 Aug 2009 15:18:35 GMT')
     output = self._output_writer.ReadOutput()
     self.assertTrue(partial_string in output)
 
     # Parse using a plugin.
-    self._magic_obj.ParseWithPlugin(u'userassist')
+    self._magic_obj.ParseWithPlugin('userassist')
 
     expected_string = (
         b'UEME_RUNPIDL:%csidl2%\\BCWipe 3.0\\BCWipe Task Manager.lnk')
     output = self._output_writer.ReadOutput()
     self.assertIn(expected_string, output)
 
-    self._magic_obj.PrintCurrentWorkingDirectory(u'')
+    self._magic_obj.PrintCurrentWorkingDirectory('')
 
     current_directory = (
         b'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\'
@@ -240,7 +243,7 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
     """Test few of the top level methods in the preg module."""
     # Open a Registry key using the magic class.
     registry_key_path = (
-        u'HKEY_CURRENT_USER\\Software\\JavaSoft\\Java Update\\Policy')
+        'HKEY_CURRENT_USER\\Software\\JavaSoft\\Java Update\\Policy')
     self._magic_obj.ChangeDirectory(registry_key_path)
 
     registry_key = self._test_console._CommandGetCurrentKey()
@@ -252,9 +255,9 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
     self.assertEqual(current_key.path, registry_key_path)
 
     # Change back to the base key.
-    self._magic_obj.ChangeDirectory(u'')
+    self._magic_obj.ChangeDirectory('')
     registry_key = self._test_console._CommandGetCurrentKey()
-    self.assertEqual(registry_key.path, u'HKEY_CURRENT_USER')
+    self.assertEqual(registry_key.path, 'HKEY_CURRENT_USER')
 
 
 if __name__ == '__main__':
