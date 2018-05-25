@@ -1,52 +1,80 @@
 # -*- coding: utf-8 -*-
-"""Class to represent binary data as hexadecimal."""
+"""Binary data in hexadecimal (hexdump) formatter."""
 
 from __future__ import unicode_literals
 
+from l2tpreg import py2to3
+
 
 class Hexdump(object):
-  """Class that defines a hexadecimal representation formatter (hexdump)."""
+  """Binary data in hexadecimal (hexdump) formatter."""
+
+  _HEXDUMP_CHARACTER_MAP = [
+      '.' if byte < 0x20 or byte > 0x7e else chr(byte) for byte in range(256)]
 
   @classmethod
-  def _FormatDataLine(cls, data, data_offset, data_size):
-    """Formats binary data in a single line of hexadecimal representation.
+  def _FormatDataInHexadecimal(cls, data):
+    """Formats data in a hexadecimal represenation.
 
     Args:
-      data: String containing the binary data.
-      data_offset: Offset of the data.
-      data_size: Size of the data.
+      data (bytes): data.
 
     Returns:
-      A Unicode string containing a hexadecimal representation of
-      the binary data.
-
-    Raises:
-      ValueError: if the data offset is out of bounds.
+      str: hexadecimal represenation of the data.
     """
-    if data_offset < 0 or data_offset >= data_size:
-      raise ValueError('Data offset value out of bounds.')
+    in_group = False
+    previous_hexadecimal_string = None
 
-    if data_size - data_offset > 16:
-      data_size = data_offset + 16
+    lines = []
+    data_size = len(data)
+    for block_index in range(0, data_size, 16):
+      data_string = data[block_index:block_index + 16]
 
-    word_values = []
-    for byte_offset in range(data_offset, data_size, 2):
-      word_value = '{0:02x}{1:02x}'.format(
-          ord(data[byte_offset]), ord(data[byte_offset + 1]))
-      word_values.append(word_value)
+      hexadecimal_byte_values = []
+      printable_values = []
+      for byte_value in data_string:
+        if isinstance(byte_value, py2to3.STRING_TYPES):
+          byte_value = ord(byte_value)
 
-    byte_values = []
-    for byte_offset in range(data_offset, data_size):
-      byte_value = ord(data[byte_offset])
-      if byte_value > 31 and byte_value < 127:
-        byte_value = data[byte_offset]
+        hexadecimal_byte_value = '{0:02x}'.format(byte_value)
+        hexadecimal_byte_values.append(hexadecimal_byte_value)
+
+        printable_value = cls._HEXDUMP_CHARACTER_MAP[byte_value]
+        printable_values.append(printable_value)
+
+      remaining_size = 16 - len(data_string)
+      if remaining_size == 0:
+        whitespace = ''
+      elif remaining_size >= 8:
+        whitespace = ' ' * ((3 * remaining_size) - 1)
       else:
-        byte_value = '.'
+        whitespace = ' ' * (3 * remaining_size)
 
-      byte_values.append(byte_value)
+      hexadecimal_string_part1 = ' '.join(hexadecimal_byte_values[0:8])
+      hexadecimal_string_part2 = ' '.join(hexadecimal_byte_values[8:16])
+      hexadecimal_string = '{0:s}  {1:s}{2:s}'.format(
+          hexadecimal_string_part1, hexadecimal_string_part2, whitespace)
 
-    return '{0:07x}: {1:s}  {2:s}'.format(
-        data_offset, ' '.join(word_values), ''.join(byte_values))
+      if (previous_hexadecimal_string is not None and
+          previous_hexadecimal_string == hexadecimal_string and
+          block_index + 16 < data_size):
+
+        if not in_group:
+          in_group = True
+
+          lines.append('...')
+
+      else:
+        printable_string = ''.join(printable_values)
+
+        lines.append('0x{0:08x}  {1:s}  {2:s}'.format(
+            block_index, hexadecimal_string, printable_string))
+
+        in_group = False
+        previous_hexadecimal_string = hexadecimal_string
+
+    lines.extend(['', ''])
+    return '\n'.join(lines)
 
   @classmethod
   def FormatData(cls, data, data_offset=0, maximum_data_size=None):
@@ -56,23 +84,16 @@ class Hexdump(object):
     translated back to their character representation.
 
     Args:
-      data: String containing the binary data.
-      data_offset: Optional offset within the data to start formatting.
-      maximum_data_size: Optional maximum size of the data to format.
-                         The default is None which represents all of
-                         the binary data.
+      data (bytes): data.
+      data_offset (Optional[int]): offset within the data to start formatting.
+      maximum_data_size (Optional[int]): maximum size of the data to format,
+          where None represents all of the data.
 
     Returns:
-      A Unicode string containing a hexadecimal representation of
-      the binary data.
+      str: hexadecimal represenation of the data.
     """
     data_size = len(data)
     if maximum_data_size is not None and maximum_data_size < data_size:
       data_size = maximum_data_size
 
-    output_strings = []
-    for line_offset in range(data_offset, data_size, 16):
-      hexdump_line = cls._FormatDataLine(data, line_offset, data_size)
-      output_strings.append(hexdump_line)
-
-    return '\n'.join(output_strings)
+    return cls._FormatDataInHexadecimal(data[data_offset:data_size])
