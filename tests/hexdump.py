@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """Tests for the binary data in hexadecimal (hexdump) formatter."""
 
+from __future__ import unicode_literals
+
 import unittest
 
 from l2tpreg import hexdump
