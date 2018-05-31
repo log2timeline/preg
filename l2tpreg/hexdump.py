@@ -14,13 +14,15 @@ class Hexdump(object):
 
   @classmethod
   def _FormatDataInHexadecimal(cls, data):
-    """Formats data in a hexadecimal represenation.
+    """Formats data in a hexadecimal representation in groups of 16 bytes.
+
+    Repeated blocks of the same 16 bytes are represented by "...".
 
     Args:
       data (bytes): data.
 
     Returns:
-      str: hexadecimal represenation of the data.
+      str: hexadecimal representation of the data in groups of 16 bytes.
     """
     in_group = False
     previous_hexadecimal_string = None
@@ -90,7 +92,7 @@ class Hexdump(object):
           where None represents all of the data.
 
     Returns:
-      str: hexadecimal represenation of the data.
+      str: hexadecimal representation of the data.
     """
     data_size = len(data)
     if maximum_data_size is not None and maximum_data_size < data_size:
