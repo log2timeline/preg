@@ -15,7 +15,8 @@ dfwinreg >= 20170521
 dpkt >= 1.8
 dtfabric >= 20180522
 efilter == 1-1.5
-elasticsearch >= 5.4.0,<= 5.5.1
+elasticsearch >= 6.0
+elasticsearch5 >= 5.4.0
 future >= 0.16.0
 hachoir-core >= 1.3.3 ; python_version < '3.0'
 hachoir-metadata >= 1.3.3 ; python_version < '3.0'
