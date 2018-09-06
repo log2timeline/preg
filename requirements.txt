@@ -12,7 +12,6 @@ construct >= 2.5.2,<= 2.5.3
 dfdatetime >= 20180509
 dfvfs >= 20180326
 dfwinreg >= 20170521
-dpkt >= 1.8
 dtfabric >= 20180522
 efilter == 1-1.5
 elasticsearch >= 6.0
