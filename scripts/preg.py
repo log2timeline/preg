@@ -63,7 +63,8 @@ class PregMagics(magic.Magics):
   # TODO: Use the output writer from the tool.
   output_writer = cli_tools.StdoutOutputWriter()
 
-  def _HiveActionList(self, unused_line):
+  # pylint: disable=unused-argument
+  def _HiveActionList(self, line):
     """Handles the hive list action.
 
     Args:
@@ -342,8 +343,9 @@ class PregMagics(magic.Magics):
       self.console.preg_tool.PrintParsedRegistryKey(
           parsed_data, file_entry=current_helper.file_entry)
 
+  # pylint: disable=unused-argument
   @magic.line_magic('pwd')
-  def PrintCurrentWorkingDirectory(self, unused_line):
+  def PrintCurrentWorkingDirectory(self, line):
     """Print the current path.
 
     Args:
@@ -425,8 +427,10 @@ class PregConsole(object):
           available.
     """
     current_key = self._currently_registry_helper.GetCurrentRegistryKey()
-    if current_key:
-      return current_key.GetValueByName(value_name)
+    if not current_key:
+      return None
+
+    return current_key.GetValueByName(value_name)
 
   def _CommandGetValueData(self, value_name):
     """Retrieves a value data from the currently loaded Windows Registry key.
@@ -438,8 +442,10 @@ class PregConsole(object):
       object: Windows Registry value data, or None if not available.
     """
     registry_value = self._CommandGetValue(value_name)
-    if registry_value:
-      return registry_value.GetDataAsObject()
+    if not registry_value:
+      return None
+
+    return registry_value.GetDataAsObject()
 
   def AddRegistryHelper(self, registry_helper):
     """Add a Registry helper to the console object.
@@ -697,11 +703,16 @@ class PregConsole(object):
 
 # Completer commands need to be top level methods or directly callable
 # and cannot be part of a class that needs to be initialized.
-def CommandCompleterCd(console, unused_core_completer):
+# pylint: disable=unused-argument
+def CommandCompleterCd(console, core_completer):
   """Command completer function for cd.
 
   Args:
-    console: IPython shell object (instance of InteractiveShellEmbed).
+    console (InteractiveShellEmbed): IPython shell object.
+    core_completer (completer.Bunch): IPython completer object.
+
+  Returns:
+    list[str]: names of subkeys.
   """
   return_list = []
 
@@ -728,11 +739,11 @@ def CommandCompleterPlugins(console, core_completer):
   """Command completer function for plugins.
 
   Args:
-    console: IPython shell object (instance of InteractiveShellEmbed).
-    core_completer: IPython completer object (instance of completer.Bunch).
+    console (InteractiveShellEmbed): IPython shell object.
+    core_completer (completer.Bunch): IPython completer object.
 
   Returns:
-    A list of command options.
+    list[str]: command options.
   """
   namespace = getattr(console, 'user_ns', {})
   magic_class = namespace.get('PregMagics', None)
@@ -762,14 +773,16 @@ def CommandCompleterPlugins(console, core_completer):
 
 # Completer commands need to be top level methods or directly callable
 # and cannot be part of a class that needs to be initialized.
-def CommandCompleterVerbose(unused_console, core_completer):
+# pylint: disable=unused-argument
+def CommandCompleterVerbose(console, core_completer):
   """Command completer function for verbose output.
 
   Args:
-    core_completer: IPython completer object (instance of completer.Bunch).
+    console (InteractiveShellEmbed): IPython shell object.
+    core_completer (completer.Bunch): IPython completer object.
 
   Returns:
-    A list of command options.
+    list[str]: command options.
   """
   if '-v' in core_completer.line:
     return []
@@ -778,7 +791,11 @@ def CommandCompleterVerbose(unused_console, core_completer):
 
 
 def Main():
-  """Run the tool."""
+  """Run the tool.
+
+  Returns:
+    bool: True if successful, False otherwise.
+  """
   tool = preg_tool.PregTool()
 
   if not tool.ParseArguments():

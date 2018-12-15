@@ -95,8 +95,12 @@ matrix:
     virtualenv:
       system_site_packages: true
   allow_failures:
-  - env: TARGET="linux-python34"
+  - env: TARGET="linux-python35"
   - env: [TARGET="linux-python34-tox", TOXENV="py34"]
+  - env: [TARGET="linux-python35-tox", TOXENV="py35"]
+  - env: [TARGET="linux-python36-tox", TOXENV="py36"]
+  - env: [TARGET="linux-python37-tox", TOXENV="py37"]
+  - env: TARGET="trusty-python34"
 install:
 - ./config/travis/install.sh
 script:
