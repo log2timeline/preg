@@ -61,6 +61,10 @@ class TestCase(object):
     name (str): name of the test case.
   """
 
+  # Note that redundant-returns-doc is broken for pylint 1.7.x for abstract
+  # methods
+  # pylint: disable=redundant-returns-doc
+
   NAME = None
 
   def __init__(
