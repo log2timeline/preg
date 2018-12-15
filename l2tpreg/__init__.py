@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 """Log2timeline preg module."""
 
-__version__ = '20180902'
+__version__ = '20181215'

@@ -3,6 +3,7 @@
 """Script to check for the availability and version of dependencies."""
 
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import sys
 
@@ -17,7 +18,7 @@ if __name__ == '__main__':
 
   if not dependency_helper.CheckDependencies():
     build_instructions_url = (
-        'https://github.com/log2timeline/plaso/wiki/Users-Guide')
+        'https://plaso.readthedocs.io/en/latest/sources/user/Users-Guide.html')
 
     print('See: {0:s} on how to set up l2tpreg.'.format(build_instructions_url))
     print('')

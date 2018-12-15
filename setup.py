@@ -3,6 +3,8 @@
 """Installation and deployment script."""
 
 from __future__ import print_function
+
+import glob
 import locale
 import os
 import sys
@@ -22,17 +24,6 @@ try:
 except ImportError:
   bdist_rpm = None
 
-try:
-  from setuptools.commands.sdist import sdist
-except ImportError:
-  from distutils.command.sdist import sdist
-
-# Change PYTHONPATH to include l2tpreg.
-sys.path.insert(0, '.')
-
-import l2tpreg  # pylint: disable=wrong-import-position
-
-
 version_tuple = (sys.version_info[0], sys.version_info[1])
 if version_tuple[0] not in (2, 3):
   print('Unsupported Python version: {0:s}.'.format(sys.version))
@@ -49,6 +40,11 @@ elif version_tuple[0] == 3 and version_tuple < (3, 4):
       'Unsupported Python 3 version: {0:s}, version 3.4 or higher '
       'required.').format(sys.version))
   sys.exit(1)
+
+# Change PYTHONPATH to include l2tpreg so that we can get the version.
+sys.path.insert(0, '.')
+
+import l2tpreg  # pylint: disable=wrong-import-position
 
 
 if not bdist_msi:
@@ -85,7 +81,7 @@ else:
         spec_file = bdist_rpm._make_spec_file(self)
 
       if sys.version_info[0] < 3:
-        python_package = 'python'
+        python_package = 'python2'
       else:
         python_package = 'python3'
 
@@ -99,29 +95,51 @@ else:
           summary = line
 
         elif line.startswith('BuildRequires: '):
-          line = 'BuildRequires: {0:s}-setuptools'.format(python_package)
+          line = 'BuildRequires: {0:s}-setuptools, {0:s}-devel'.format(
+              python_package)
 
         elif line.startswith('Requires: '):
           if python_package == 'python3':
-            line = line.replace('python', 'python3')
+            line = line.replace('python-', 'python3-')
+            line = line.replace('python2-', 'python3-')
 
         elif line.startswith('%description'):
           in_description = True
 
+        elif line.startswith('python setup.py build'):
+          if python_package == 'python3':
+            line = '%py3_build'
+          else:
+            line = '%py2_build'
+
+        elif line.startswith('python setup.py install'):
+          if python_package == 'python3':
+            line = '%py3_install'
+          else:
+            line = '%py2_install'
+
         elif line.startswith('%files'):
-          # Cannot use %{_libdir} here since it can expand to "lib64".
           lines = [
               '%files -n {0:s}-%{{name}}'.format(python_package),
               '%defattr(644,root,root,755)',
-              '%doc ACKNOWLEDGEMENTS AUTHORS LICENSE README',
-              '%{_prefix}/bin/*.py',
-              '%{_prefix}/lib/python*/site-packages/**/',
-              '%{_prefix}/lib/python*/site-packages/l2tpreg*.egg-info/*',
-              '',
-              '%exclude %{_prefix}/share/doc/*',
-              '%exclude %{_prefix}/lib/python*/site-packages/**/*.pyc',
-              '%exclude %{_prefix}/lib/python*/site-packages/**/*.pyo',
-              '%exclude %{_prefix}/lib/python*/site-packages/**/__pycache__/*']
+              '%doc ACKNOWLEDGEMENTS AUTHORS LICENSE README']
+
+          if python_package == 'python3':
+            lines.extend([
+                '%{python3_sitelib}/l2tpreg/*.py',
+                '%{python3_sitelib}/l2tpreg*.egg-info/*',
+                '',
+                '%exclude %{_prefix}/share/doc/*',
+                '%exclude %{python3_sitelib}/l2tpreg/__pycache__/*'])
+
+          else:
+            lines.extend([
+                '%{python2_sitelib}/l2tpreg/*.py',
+                '%{python2_sitelib}/l2tpreg*.egg-info/*',
+                '',
+                '%exclude %{_prefix}/share/doc/*',
+                '%exclude %{python2_sitelib}/l2tpreg/*.pyc',
+                '%exclude %{python2_sitelib}/l2tpreg/*.pyo'])
 
           python_spec_file.extend(lines)
           break
@@ -131,6 +149,12 @@ else:
 
           python_spec_file.append(
               '%package -n {0:s}-%{{name}}'.format(python_package))
+          if python_package == 'python2':
+            python_spec_file.append(
+                'Obsoletes: python-l2tpreg < %{version}')
+            python_spec_file.append(
+                'Provides: python-l2tpreg = %{version}')
+
           python_spec_file.append('{0:s}'.format(summary))
           python_spec_file.append('')
           python_spec_file.append(
@@ -156,7 +180,7 @@ if version_tuple[0] == 2:
   if not encoding:
     encoding = locale.getpreferredencoding()
 
-  # Make sure the default encoding is set correctly otherwise
+  # Make sure the default encoding is set correctly otherwise on Python 2
   # setup.py sdist will fail to include filenames with Unicode characters.
   reload(sys)  # pylint: disable=undefined-variable
 
@@ -182,8 +206,7 @@ setup(
     maintainer_email='log2timeline-maintainers@googlegroups.com',
     cmdclass={
         'bdist_msi': BdistMSICommand,
-        'bdist_rpm': BdistRPMCommand,
-        'sdist_test_data': sdist},
+        'bdist_rpm': BdistRPMCommand},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -193,11 +216,11 @@ setup(
     packages=find_packages('.', exclude=[
         'scripts', 'tests', 'tests.*', 'utils']),
     package_dir={
-        'l2tpreg': 'l2tpreg',
+        'l2tpreg': 'l2tpreg'
     },
-    scripts=[os.path.join('scripts', 'preg.py')],
+    scripts=glob.glob(os.path.join('scripts', '[a-z]*.py')),
     data_files=[
         ('share/doc/l2tpreg', [
-            'AUTHORS', 'ACKNOWLEDGEMENTS', 'LICENSE', 'README']),
+            'ACKNOWLEDGEMENTS', 'AUTHORS', 'LICENSE', 'README']),
     ],
 )
