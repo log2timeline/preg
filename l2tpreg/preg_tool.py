@@ -556,6 +556,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
     return file_system, mount_point
 
+  # pylint: disable=arguments-differ
   def _GetTSKPartitionIdentifiers(
       self, scan_node, partition_offset=None, partitions=None):
     """Determines the TSK partition identifiers.
@@ -567,7 +568,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     Args:
       scan_node (dfvfs.SourceScanNode): scan node.
       partition_offset (Optional[int]): preferred partition byte offset.
-      paritions (Optional[list[str]]): preferred partition identifiers.
+      partitions (Optional[list[str]]): preferred partition identifiers.
 
     Returns:
       list[str]: partition identifiers.
@@ -589,7 +590,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
         volume_system)
     if not volume_identifiers:
       logging.info('No partitions found.')
-      return
+      return None
 
     # Go over all the detected volume identifiers and only include
     # detected Windows partitions.
@@ -641,7 +642,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
       return windows_volume_identifiers
 
     try:
-      selected_volume_identifier = self._PromptUserForPartitionIdentifier(
+      selected_volume_identifier = self._PromptUserForPartitionIdentifiers(
           volume_system, windows_volume_identifiers)
     except KeyboardInterrupt:
       raise errors.UserAbort('File system scan aborted.')
@@ -944,12 +945,12 @@ class PregTool(storage_media_tool.StorageMediaTool):
     """Build a list of all available Windows Registry plugins.
 
     Returns:
-      PluginList: Windows Registry plugin list.
+      PluginList: Windows Registry plugin list or None if not available.
     """
     winreg_parser = parsers_manager.ParsersManager.GetParserObjectByName(
         'winreg')
     if not winreg_parser:
-      return
+      return None
 
     registry_plugin_list = plugin_list.PluginList()
     for _, plugin_class in winreg_parser.GetPlugins():
@@ -1213,6 +1214,8 @@ class PregTool(storage_media_tool.StorageMediaTool):
     header_string = format_string.format(' {0:s} '.format(text))
     self._output_writer.Write(header_string)
 
+  # PyLint is unable to handle multiple types.
+  # pylint: disable=missing-type-doc
   def ParseRegistryKey(self, registry_key, registry_helper, use_plugins=None):
     """Extracts information from a Windows Registry key.
 
@@ -1286,7 +1289,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
       winreg_parser = parsers_manager.ParsersManager.GetParserObjectByName(
           'winreg')
       if not winreg_parser:
-        return
+        return {}
 
       default_plugin_object = winreg_parser.GetPluginObjectByName(
           'winreg_default')

@@ -131,10 +131,15 @@ class PluginList(object):
     Returns:
       plaso.WindowsRegistryPlugin: Windows Registry plugin or None.
     """
+    plugin = None
+
     # TODO: make this a dict lookup instead of a list iteration.
     for plugin_cls in self.GetPlugins(registry_file_type):
       if plugin_cls.NAME == plugin_name:
-        return plugin_cls()
+        plugin = plugin_cls()
+        break
+
+    return plugin
 
   def GetPluginObjects(self, registry_file_type):
     """Creates new instances of a specific type of Windows Registry plugins.

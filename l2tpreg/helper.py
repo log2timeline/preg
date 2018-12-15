@@ -41,7 +41,7 @@ class PregRegistryHelper(object):
 
     Args:
       file_entry (dfvfs.FileEntry): file entry.
-      collector_name (str0: name of the collector, for example "TSK".
+      collector_name (str): name of the collector, for example "TSK".
       codepage (Optional[str]): codepage value used for the Windows Registry
           file.
     """
@@ -92,8 +92,10 @@ class PregRegistryHelper(object):
   @property
   def root_key(self):
     """dfwinreg.WinRegistryKey: root key of Windows Registry file."""
-    if self._registry_file:
-      return self._registry_file.GetRootKey()
+    if not self._registry_file:
+      return None
+
+    return self._registry_file.GetRootKey()
 
   def _Reset(self):
     """Resets all attributes of the Registry helper."""
@@ -195,7 +197,7 @@ class PregRegistryHelper(object):
     """
     registry_key = self._win_registry.GetKeyByPath(key_path)
     if not registry_key:
-      return
+      return None
 
     self._currently_registry_key = registry_key
     return registry_key
@@ -280,6 +282,7 @@ class PregRegistryHelper(object):
 
     Raises:
       IOError: if the Windows Registry file cannot be opened.
+      OSError: if the Windows Registry file cannot be opened.
     """
     if self._registry_file:
       raise IOError('Registry file already open.')
