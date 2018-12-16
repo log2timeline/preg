@@ -71,7 +71,7 @@ class PluginList(object):
       self._plugins.setdefault(plugin_type, []).append(plugin_class)
 
   def GetAllPlugins(self):
-    """Rerieves all plugins.
+    """Retrieves all plugins.
 
     Returns:
       list[plaso.WindowsRegistryPlugin]: all plugins.

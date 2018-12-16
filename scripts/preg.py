@@ -408,7 +408,7 @@ class PregConsole(object):
     self.preg_tool = tool
 
   def _CommandGetCurrentKey(self):
-    """Retreives the currently loaded Registry key.
+    """Retrieves the currently loaded Registry key.
 
     Returns:
       dfwinreg.WinRegistryKey: currently loaded Registry key or None if

@@ -152,10 +152,10 @@ class PregTool(storage_media_tool.StorageMediaTool):
 
   def _CreateWindowsPathResolver(
       self, file_system, mount_point, environment_variables):
-    """Creates a Windows path resolver and sets the evironment variables.
+    """Creates a Windows path resolver and sets the environment variables.
 
     Args:
-      file_system (dfvfs.FileSytem): file system.
+      file_system (dfvfs.FileSystem): file system.
       mount_point (dfvfs.PathSpec): mount point path specification.
       environment_variables (list[EnvironmentVariableArtifact]): environment
           variables.
@@ -924,7 +924,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     """Scans a file system for the Windows volume.
 
     Args:
-      path_resolver (dfvfs.WindowsPathResolver): the Windos path resolver.
+      path_resolver (dfvfs.WindowsPathResolver): the Windows path resolver.
 
     Returns:
       bool: True if the Windows directory was found, False otherwise.
@@ -961,7 +961,7 @@ class PregTool(storage_media_tool.StorageMediaTool):
     """Determines and returns back a list of Windows volume identifiers.
 
     Args:
-      scan_node (dfvfs.ScanNode): scan node.
+      scan_node (dfvfs.SourceScanNode): scan node.
       volume_identifiers (list[str]): allowed volume identifiers.
 
     Returns:

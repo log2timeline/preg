@@ -62,7 +62,7 @@ class PregConsoleTest(test_lib.CLIToolTestCase):
     self._registry_helper = helper.PregRegistryHelper(file_entry, 'OS')
 
   def tearDown(self):
-    """Tears down the needed ojects after a test."""
+    """Tears down the needed objects after a test."""
     self._registry_helper.Close()
 
   def testAddRegistryHelpers(self):
@@ -171,7 +171,7 @@ class PregMagicClassTest(test_lib.CLIToolTestCase):
     setattr(self._test_console, '_output_writer', self._output_writer)
 
   def tearDown(self):
-    """Tears down the needed ojects after a test."""
+    """Tears down the needed objects after a test."""
     self._registry_helper.Close()
 
   def testHiveActions(self):
